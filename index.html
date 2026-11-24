@@ -100,8 +100,8 @@
     input[type="range"].studio-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 17px;
-      height: 17px;
+      width: 19px;
+      height: 19px;
       border-radius: 50%;
       background: #FFFFFF;
       border: 2.5px solid #FF6B9D;
@@ -117,8 +117,8 @@
     }
 
     input[type="range"].studio-slider::-moz-range-thumb {
-      width: 17px;
-      height: 17px;
+      width: 19px;
+      height: 19px;
       border-radius: 50%;
       background: #FFFFFF;
       border: 2.5px solid #FF6B9D;
@@ -141,7 +141,7 @@
       height: 5px;
     }
 
-    /* Checkerboard subtle studio background behind transparent images */
+    /* Checkerboard subtle studio background */
     .studio-checkerboard {
       background-image:
         linear-gradient(45deg, #141419 25%, transparent 25%),
@@ -161,7 +161,6 @@
       animation: pulseGlow 3s infinite ease-in-out;
     }
 
-    /* Hide scrollbar for horizontal strips on mobile */
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
@@ -171,10 +170,10 @@
     }
   </style>
 </head>
-<body class="min-h-screen lg:h-screen lg:overflow-hidden flex flex-col select-none">
+<body class="min-h-[100dvh] lg:h-screen lg:overflow-hidden flex flex-col select-none">
 
-  <!-- Hidden File Inputs -->
-  <input type="file" id="imageFileInput" accept="image/jpeg,image/png,image/webp" class="hidden" />
+  <!-- Hidden File Inputs (image/* giúp iPhone chọn ảnh HEIC/JPG mượt mà) -->
+  <input type="file" id="imageFileInput" accept="image/*" class="hidden" />
   <input type="file" id="importPresetsInput" accept="application/json,.json" class="hidden" />
 
   <!-- Drag & Drop Overlay -->
@@ -231,7 +230,7 @@
         </button>
       </div>
 
-      <!-- Top Action Buttons: Upload, Save Preset, Reset, Export -->
+      <!-- Top Action Buttons -->
       <div class="order-2 lg:order-3 flex items-center gap-1.5 sm:gap-2">
         <button id="uploadBtn" type="button" class="flex items-center gap-1.5 rounded-xl border border-zinc-700/80 bg-zinc-800/80 px-2.5 sm:px-3 py-2 text-xs sm:text-sm font-medium text-zinc-100 transition hover:border-[#FF6B9D]/60 hover:bg-zinc-800 active:scale-95">
           <svg class="h-4 w-4 text-[#FF6B9D]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -269,7 +268,6 @@
     
     <!-- LEFT / CENTER: Canvas Viewport & Before/After Split Comparison -->
     <section class="relative flex-1 flex flex-col items-center justify-between bg-[#09090B] p-3 sm:p-5 lg:p-6 overflow-hidden">
-      <!-- Subtle ambient studio backlight -->
       <div class="pointer-events-none absolute inset-0 flex items-center justify-center opacity-25">
         <div class="h-72 w-72 rounded-full bg-[#FF6B9D]/20 blur-[110px]"></div>
         <div class="h-72 w-72 rounded-full bg-[#8B5CF6]/20 blur-[110px] -ml-16"></div>
@@ -293,17 +291,14 @@
       </div>
 
       <!-- Central Image Stage Container -->
-      <div id="viewportContainer" class="relative z-10 flex-1 w-full flex items-center justify-center min-h-[260px] max-h-[46vh] sm:max-h-[54vh] lg:max-h-none my-1">
+      <div id="viewportContainer" class="relative z-10 flex-1 w-full flex items-center justify-center min-h-[250px] max-h-[44vh] sm:max-h-[54vh] lg:max-h-none my-1">
         <div id="stageWrapper" class="relative overflow-hidden rounded-2xl border border-zinc-800/90 studio-checkerboard shadow-[0_20px_60px_rgba(0,0,0,0.85)] transition-shadow duration-300">
-          <!-- Edited Image Canvas (Full Layer) -->
           <canvas id="editedCanvas" class="block w-full h-full"></canvas>
 
-          <!-- Original Image Canvas (Clipped Before Layer) -->
           <div id="beforeClipLayer" class="absolute inset-0 overflow-hidden pointer-events-none" style="clip-path: inset(0 50% 0 0);">
             <canvas id="originalCanvas" class="block w-full h-full"></canvas>
           </div>
 
-          <!-- Corner Labels for Split Mode -->
           <div id="labelBefore" class="pointer-events-none absolute top-3 left-3 rounded-lg bg-black/65 backdrop-blur-md border border-white/10 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-zinc-200 transition-opacity duration-200">
             Trước
           </div>
@@ -311,13 +306,12 @@
             Sau
           </div>
 
-          <!-- Hold-to-View Original Banner -->
           <div id="holdingOriginalBanner" class="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 hidden rounded-full bg-black/80 backdrop-blur-md border border-white/15 px-3.5 py-1 text-xs font-medium text-white shadow-lg">
             Đang hiển thị ảnh gốc
           </div>
 
           <!-- Interactive Split-Screen Divider Handle -->
-          <div id="splitDivider" class="absolute top-0 bottom-0 z-20 w-9 -ml-4.5 cursor-ew-resize touch-none flex items-center justify-center group" style="left: 50%; margin-left: -18px;">
+          <div id="splitDivider" class="absolute top-0 bottom-0 z-20 w-10 cursor-ew-resize touch-none flex items-center justify-center group" style="left: 50%; margin-left: -20px;">
             <div class="h-full w-[2px] bg-white/90 shadow-[0_0_10px_rgba(255,107,157,0.9)] group-hover:bg-[#FF6B9D] transition-colors"></div>
             <div class="absolute flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-[#121216]/90 text-white shadow-[0_0_16px_rgba(0,0,0,0.8)] group-hover:scale-110 group-hover:border-[#FF6B9D] transition-all">
               <svg class="h-4 w-4 text-[#FF6B9D]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -330,7 +324,6 @@
 
       <!-- Bottom Floating Studio Action Bar -->
       <div class="relative z-10 mt-2.5 flex flex-wrap items-center justify-center gap-2 sm:gap-3 rounded-2xl border border-zinc-800/90 bg-[#121216]/95 backdrop-blur-md p-2 shadow-xl">
-        <!-- Magic AI Auto Color Button -->
         <button id="autoColorBtn" type="button" class="ai-btn-glow flex items-center gap-1.5 rounded-xl hypic-gradient px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:brightness-110 active:scale-95">
           <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
@@ -338,7 +331,6 @@
           <span>✨ Tự Động Chỉnh Màu</span>
         </button>
 
-        <!-- Toggle Split Screen Before/After -->
         <button id="toggleSplitBtn" type="button" class="flex items-center gap-1.5 rounded-xl border border-[#FF6B9D]/50 bg-[#FF6B9D]/15 px-3 sm:px-3.5 py-2.5 text-xs sm:text-sm font-medium text-white transition hover:bg-[#FF6B9D]/25 active:scale-95">
           <svg class="h-4 w-4 text-[#FF6B9D]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 3v18m6-18v18M4 7h16M4 17h16" />
@@ -346,7 +338,6 @@
           <span>Chia đôi</span>
         </button>
 
-        <!-- Hold to Compare Original Button -->
         <button id="holdOriginalBtn" type="button" class="flex items-center gap-1.5 rounded-xl border border-zinc-700/80 bg-zinc-800/90 px-3 sm:px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-200 transition hover:border-zinc-600 hover:text-white active:bg-[#8B5CF6]/30 active:border-[#8B5CF6]">
           <svg class="h-4 w-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -383,11 +374,8 @@
       <!-- Scrollable Tab Content Area -->
       <div class="flex-1 overflow-y-auto p-4 sm:p-5">
 
-        <!-- ================================================================ -->
-        <!-- TAB 1: MẪU MÀU (20 PRESETS + CUSTOM SAVED PRESETS ON DEVICE)      -->
-        <!-- ================================================================ -->
+        <!-- TAB 1: MẪU MÀU -->
         <div id="tabPanel-presets" class="tab-panel space-y-4">
-          <!-- Preset Intensity Slider -->
           <div class="rounded-2xl border border-zinc-800/90 bg-[#1A1A21] p-3">
             <div class="flex items-center justify-between text-xs mb-2">
               <span class="font-medium text-zinc-300">Cường độ mẫu màu (Cơ bản + HSL)</span>
@@ -396,7 +384,6 @@
             <input id="presetIntensitySlider" type="range" min="0" max="100" value="100" class="studio-slider" />
           </div>
 
-          <!-- Category Filter Pills + Quick Save Button -->
           <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
               <button type="button" data-cat="all" class="preset-cat-btn active-cat rounded-xl border border-[#FF6B9D]/60 bg-[#FF6B9D]/15 px-2.5 py-1.5 text-xs font-semibold text-white shrink-0 transition">
@@ -415,7 +402,6 @@
             </div>
           </div>
 
-          <!-- Custom Presets Toolbar (Shown when "Của tôi" is active or always accessible) -->
           <div id="customPresetsToolbar" class="hidden rounded-2xl border border-zinc-800/90 bg-[#1A1A21]/90 p-3 space-y-2.5">
             <div class="flex items-center justify-between gap-2">
               <div class="text-xs text-zinc-300 font-medium">Mẫu lưu trên thiết bị này</div>
@@ -439,15 +425,10 @@
             </div>
           </div>
 
-          <!-- Presets Grid -->
-          <div id="presetsGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2.5 pb-6">
-            <!-- Preset cards dynamically rendered by JS -->
-          </div>
+          <div id="presetsGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2.5 pb-6"></div>
         </div>
 
-        <!-- ================================================================ -->
-        <!-- TAB 2: CƠ BẢN (10 MANUAL BASIC ADJUSTMENTS)                      -->
-        <!-- ================================================================ -->
+        <!-- TAB 2: CƠ BẢN -->
         <div id="tabPanel-basic" class="tab-panel hidden space-y-3.5 pb-6">
           <div class="flex items-center justify-between mb-1">
             <span class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Ánh sáng &amp; Sắc thái tổng thể</span>
@@ -455,14 +436,10 @@
               Đặt lại Cơ bản
             </button>
           </div>
-          <div id="slidersContainer" class="space-y-3">
-            <!-- 10 sliders dynamically rendered by JS -->
-          </div>
+          <div id="slidersContainer" class="space-y-3"></div>
         </div>
 
-        <!-- ================================================================ -->
-        <!-- TAB 3: TRỘN MÀU HSL (LIGHTROOM 8-CHANNEL COLOR MIXER)            -->
-        <!-- ================================================================ -->
+        <!-- TAB 3: TRỘN MÀU HSL -->
         <div id="tabPanel-hsl" class="tab-panel hidden space-y-4 pb-6">
           <div class="flex items-center justify-between">
             <div>
@@ -474,13 +451,9 @@
             </button>
           </div>
 
-          <!-- 8 Circular Color Channel Swatches -->
           <div class="rounded-2xl border border-zinc-800/90 bg-[#1A1A21] p-3.5">
-            <div id="hslSwatchesRow" class="grid grid-cols-8 gap-1.5 sm:gap-2">
-              <!-- 8 swatches injected by JS -->
-            </div>
+            <div id="hslSwatchesRow" class="grid grid-cols-8 gap-1.5 sm:gap-2"></div>
 
-            <!-- Selected Color Channel Header & Single Channel Reset -->
             <div class="mt-4 pt-3 border-t border-zinc-800/80 flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <span id="selectedHslDot" class="h-3.5 w-3.5 rounded-full border border-white/40 shadow-sm" style="background-color: #F97316;"></span>
@@ -495,9 +468,7 @@
             </div>
           </div>
 
-          <!-- 3 Precision Sliders for Active Color Channel (Hue, Saturation, Luminance) -->
           <div class="space-y-3">
-            <!-- Hue -->
             <div class="rounded-2xl border border-zinc-800/80 bg-[#1A1A21]/85 p-3.5">
               <div class="flex items-center justify-between text-xs mb-2">
                 <label for="hslHueSlider" class="font-medium text-zinc-200 cursor-pointer" title="Nhấp đúp để đặt lại 0">
@@ -513,7 +484,6 @@
               </div>
             </div>
 
-            <!-- Saturation -->
             <div class="rounded-2xl border border-zinc-800/80 bg-[#1A1A21]/85 p-3.5">
               <div class="flex items-center justify-between text-xs mb-2">
                 <label for="hslSatSlider" class="font-medium text-zinc-200 cursor-pointer" title="Nhấp đúp để đặt lại 0">
@@ -529,7 +499,6 @@
               </div>
             </div>
 
-            <!-- Luminance -->
             <div class="rounded-2xl border border-zinc-800/80 bg-[#1A1A21]/85 p-3.5">
               <div class="flex items-center justify-between text-xs mb-2">
                 <label for="hslLumSlider" class="font-medium text-zinc-200 cursor-pointer" title="Nhấp đúp để đặt lại 0">
@@ -546,7 +515,6 @@
             </div>
           </div>
 
-          <!-- Pro Photography Tip Box -->
           <div class="rounded-2xl border border-purple-500/20 bg-purple-500/5 p-3 text-[11px] text-zinc-300 leading-relaxed">
             <span class="font-semibold text-[#FF6B9D]">Mẹo chỉnh nhanh:</span> Chọn kênh <strong class="text-orange-400">Cam</strong> và tăng <strong class="text-white">Độ sáng (+15 đến +30)</strong> để làm da trắng hồng tự nhiên; chọn <strong class="text-sky-400">Xanh dương</strong> và kéo <strong class="text-white">Sắc độ (-25)</strong> để tạo bầu trời màu Teal điện ảnh.
           </div>
@@ -579,7 +547,7 @@
             type="text"
             maxlength="32"
             placeholder="Ví dụ: Nàng thơ chiều tà, Tone da Hàn Quốc..."
-            class="w-full rounded-xl border border-zinc-700 bg-[#1A1A21] px-3.5 py-2.5 text-sm text-white placeholder-zinc-500 focus:border-[#FF6B9D] focus:outline-none"
+            class="select-text w-full rounded-xl border border-zinc-700 bg-[#1A1A21] px-3.5 py-2.5 text-sm text-white placeholder-zinc-500 focus:border-[#FF6B9D] focus:outline-none"
           />
         </div>
 
@@ -613,10 +581,10 @@
   </div>
 
   <!-- Export / Download Quality Modal -->
-  <div id="exportModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
-    <div class="w-full max-w-md rounded-3xl border border-zinc-800 bg-[#121216] p-6 shadow-2xl">
+  <div id="exportModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="w-full max-w-md rounded-3xl border border-zinc-800 bg-[#121216] p-6 shadow-2xl my-auto">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-bold text-white">Xuất Ảnh Chất Lượng Gốc</h3>
+        <h3 class="text-lg font-bold text-white">Xuất Ảnh Chất Lượng Cao</h3>
         <button id="closeExportModalBtn" type="button" class="rounded-xl p-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-white">
           <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -628,7 +596,7 @@
         <div class="rounded-2xl border border-zinc-800 bg-[#1A1A21] p-3.5 text-xs space-y-1.5">
           <div class="flex justify-between">
             <span class="text-zinc-400">Độ phân giải xuất:</span>
-            <span id="exportResolutionText" class="font-mono font-semibold text-white">1080 × 1350 px (100% Gốc)</span>
+            <span id="exportResolutionText" class="font-mono font-semibold text-white">1080 × 1350 px</span>
           </div>
           <div class="flex justify-between">
             <span class="text-zinc-400">Mẫu màu đang dùng:</span>
@@ -636,13 +604,12 @@
           </div>
         </div>
 
-        <!-- Format Selection -->
         <div>
           <label class="block text-xs font-medium text-zinc-300 mb-2">Định dạng tệp</label>
           <div class="grid grid-cols-2 gap-2.5">
             <button type="button" data-format="image/jpeg" class="export-format-btn active-format rounded-xl border border-[#FF6B9D] bg-[#FF6B9D]/15 p-3 text-left transition">
               <div class="text-sm font-bold text-white">JPG (Khuyên dùng)</div>
-              <div class="text-[11px] text-zinc-400 mt-0.5">Chất lượng 95% • Tối ưu mạng xã hội</div>
+              <div class="text-[11px] text-zinc-400 mt-0.5">Chất lượng 95% • Tối ưu iPhone</div>
             </button>
             <button type="button" data-format="image/png" class="export-format-btn rounded-xl border border-zinc-800 bg-[#1A1A21] p-3 text-left transition hover:border-zinc-700">
               <div class="text-sm font-bold text-white">PNG Lossless</div>
@@ -651,32 +618,30 @@
           </div>
         </div>
 
+        <!-- Vùng hiển thị ảnh sau khi xuất để iPhone nhấn giữ -> Lưu vào Ảnh dễ dàng -->
+        <div id="iosExportResultBox" class="hidden rounded-2xl border border-[#FF6B9D]/40 bg-[#1A1A21] p-3 text-center space-y-2">
+          <p class="text-xs font-medium text-[#FF6B9D]">Trên iPhone: Nhấn giữ vào ảnh bên dưới → chọn "Lưu vào Ảnh"</p>
+          <img id="iosExportPreviewImg" alt="Ảnh đã chỉnh màu" class="mx-auto max-h-56 rounded-xl border border-zinc-700 object-contain select-auto" />
+        </div>
+
         <button id="confirmDownloadBtn" type="button" class="w-full flex items-center justify-center gap-2 rounded-2xl hypic-gradient py-3.5 text-sm font-bold text-white hypic-glow transition hover:brightness-110 active:scale-[0.99]">
           <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg>
-          <span>Lưu Ảnh Về Máy Ngay</span>
+          <span>Tạo &amp; Lưu Ảnh Về Máy</span>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Toast Notification Container (Replaces alert/confirm) -->
+  <!-- Toast Notification Container -->
   <div id="toastContainer" class="fixed bottom-20 lg:bottom-6 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 pointer-events-none"></div>
 
   <script>
-    /**
-     * ============================================================================
-     * HYPIC STUDIO PRO - CHỈNH MÀU ẢNH TỰ ĐỘNG, HSL COLOR MIXER & LƯU MẪU CÁ NHÂN
-     * Xử lý ảnh 100% Client-Side HTML5 Canvas (Zero CORS, 60fps LUT Engine)
-     * ============================================================================
-     */
-
     const STORAGE_KEY_CUSTOM_PRESETS = 'hypic_studio_custom_presets_v1';
+    const MAX_SAFE_DIMENSION = 2560; // Giới hạn an toàn tránh tràn RAM Canvas trên iPhone Safari
 
-    // ----------------------------------------------------------------------------
-    // 1. ĐỊNH NGHĨA 10 THANH CƠ BẢN & 8 KÊNH MÀU HSL CHUẨN LIGHTROOM
-    // ----------------------------------------------------------------------------
+    // 1. ĐỊNH NGHĨA 10 THANH CƠ BẢN & 8 KÊNH MÀU HSL
     const ADJUSTMENT_DEFS = [
       { key: 'brightness', label: 'Độ sáng', min: -100, max: 100, default: 0, icon: '☀️' },
       { key: 'contrast', label: 'Tương phản', min: -100, max: 100, default: 0, icon: '◐' },
@@ -724,9 +689,7 @@
       return map;
     }
 
-    // ----------------------------------------------------------------------------
-    // 2. THƯ VIỆN 20 MẪU MÀU SẴN CÓ (HYPIC & LIGHTROOM COLLECTION)
-    // ----------------------------------------------------------------------------
+    // 2. THƯ VIỆN 20 MẪU MÀU SẴN CÓ
     const BUILTIN_PRESETS = [
       {
         id: 'original',
@@ -1019,9 +982,7 @@
       }
     ];
 
-    // ----------------------------------------------------------------------------
-    // 3. QUẢN LÝ MẪU MÀU TỰ LƯU TRÊN TỪNG MÁY (LOCALSTORAGE)
-    // ----------------------------------------------------------------------------
+    // 3. QUẢN LÝ MẪU MÀU TỰ LƯU (LOCALSTORAGE)
     let customPresets = [];
 
     function loadCustomPresetsFromStorage() {
@@ -1045,7 +1006,6 @@
           }));
         }
       } catch (err) {
-        console.warn('Không thể đọc mẫu màu từ bộ nhớ máy:', err);
         customPresets = [];
       }
     }
@@ -1062,24 +1022,17 @@
       return [...customPresets, ...BUILTIN_PRESETS];
     }
 
-    // ----------------------------------------------------------------------------
-    // 4. TRẠNG THÁI ỨNG DỤNG (STATE)
-    // ----------------------------------------------------------------------------
+    // 4. TRẠNG THÁI ỨNG DỤNG
     const state = {
-      activeTab: 'presets', // 'presets' | 'basic' | 'hsl'
-      activePresetCategory: 'all', // 'all' | 'custom' | 'lightroom' | 'hypic'
+      activeTab: 'presets',
+      activePresetCategory: 'all',
       activePresetId: 'original',
       presetIntensity: 100,
-
-      // Thông số cơ bản (10 thanh)
       userOffsets: {},
       currentParams: {},
-
-      // Thông số HSL (8 kênh màu)
       selectedHslChannel: 'orange',
       userHslOffsets: createEmptyHslMap(),
       currentHsl: createEmptyHslMap(),
-
       splitTone: null,
       splitActive: true,
       splitPercent: 50,
@@ -1089,6 +1042,7 @@
       activeSampleKey: 'sunset_muse',
       sourceWidth: 1080,
       sourceHeight: 1350,
+      lastExportObjectUrl: null,
     };
 
     ADJUSTMENT_DEFS.forEach(def => {
@@ -1096,7 +1050,6 @@
       state.currentParams[def.key] = 0;
     });
 
-    // Các Canvas Offscreen & Hiển thị
     const fullSourceCanvas = document.createElement('canvas');
     const fullSourceCtx = fullSourceCanvas.getContext('2d', { willReadFrequently: true });
 
@@ -1112,9 +1065,7 @@
     const editedCanvas = document.getElementById('editedCanvas');
     const editedCtx = editedCanvas.getContext('2d', { willReadFrequently: true });
 
-    // ----------------------------------------------------------------------------
-    // 5. BỘ TẠO 3 ẢNH MẪU NGHỆ THUẬT ĐỘ PHÂN GIẢI CAO (100% CANVAS - ZERO CORS)
-    // ----------------------------------------------------------------------------
+    // 5. BỘ TẠO 3 ẢNH MẪU NGHỆ THUẬT
     const SampleArtworkGenerator = {
       renderSample(key, targetCanvas) {
         const w = 1080;
@@ -1333,7 +1284,7 @@
 
         for (let b = 0; b < 9; b++) {
           const bx = w * (0.14 + b * 0.09);
-          const by = h * 0.50 + Math.sin(b * 0.😎 * 10;
+          const by = h * 0.50 + Math.sin(b * 0.8) * 10;
           const bulbGlow = ctx.createRadialGradient(bx, by, 2, bx, by, 26);
           bulbGlow.addColorStop(0, '#FFFBEB');
           bulbGlow.addColorStop(0.4, 'rgba(251, 191, 36, 0.6)');
@@ -1449,9 +1400,7 @@
       }
     };
 
-    // ----------------------------------------------------------------------------
-    // 6. ĐỘNG CƠ XỬ LÝ PIXEL TỐC ĐỘ CAO: BASIC + 360° HSL LUT COLOR MIXER
-    // ----------------------------------------------------------------------------
+    // 6. ĐỘNG CƠ XỬ LÝ PIXEL: BASIC + 360° HSL LUT COLOR MIXER
     function buildHslLookupTables(hslMap) {
       if (!hslMap) return null;
 
@@ -1466,7 +1415,6 @@
       }
       if (!hasActive) return null;
 
-      // Bảng tra cứu 720 mức (mỗi 0.5 độ trên vòng tròn 360°) giúp chạy 60fps
       const BINS = 720;
       const hueLUT = new Float32Array(BINS);
       const satLUT = new Float32Array(BINS);
@@ -1476,7 +1424,6 @@
       for (let b = 0; b < BINS; b++) {
         const deg = (b * 360) / BINS;
 
-        // Tìm 2 kênh màu liền kề bao quanh góc deg để nội suy mượt mà
         let leftIdx = n - 1;
         let rightIdx = 0;
         let leftDeg = HSL_CHANNELS[n - 1].center;
@@ -1494,14 +1441,12 @@
 
         const span = rightDeg - leftDeg;
         const t = span > 0 ? (deg - leftDeg) / span : 0;
-        // Smoothstep Hermite cho chuyển tiếp dải màu tự nhiên như Lightroom
         const wRight = t * t * (3 - 2 * t);
         const wLeft = 1 - wRight;
 
         const cLeft = hslMap[HSL_CHANNELS[leftIdx].key] || { h: 0, s: 0, l: 0 };
         const cRight = hslMap[HSL_CHANNELS[rightIdx].key] || { h: 0, s: 0, l: 0 };
 
-        // Hue shift tối đa ±32 độ, Saturation ±100%, Luminance ±0.35
         hueLUT[b] = ((cLeft.h * wLeft + cRight.h * wRight) / 100) * 32;
         satLUT[b] = (cLeft.s * wLeft + cRight.s * wRight) / 100;
         lumLUT[b] = ((cLeft.l * wLeft + cRight.l * wRight) / 100) * 0.34;
@@ -1535,7 +1480,6 @@
       const grain = params.grain || 0;
       const vignette = params.vignette || 0;
 
-      // Tiền tính toán hằng số Basic Adjustments
       const brightOffset = (brightness / 100) * 56;
       const cVal = contrast * 1.15;
       const contrastFactor = (259 * (cVal + 255)) / (255 * (259 - cVal));
@@ -1558,7 +1502,6 @@
       const grainAmount = (grain / 100) * 44;
       const vigStrength = (vignette / 100) * 0.65;
 
-      // Split-toning
       const hasSplit = splitTone && intensityRatio > 0;
       const shR = hasSplit ? splitTone.shadow[0] * intensityRatio : 0;
       const shG = hasSplit ? splitTone.shadow[1] * intensityRatio : 0;
@@ -1567,10 +1510,8 @@
       const hiG = hasSplit ? splitTone.highlight[1] * intensityRatio : 0;
       const hiB = hasSplit ? splitTone.highlight[2] * intensityRatio : 0;
 
-      // Tiền tính toán HSL LUT (chỉ kích hoạt khi có kênh màu != 0)
       const hslLUT = buildHslLookupTables(hslMap);
 
-      // Tiền tính toán tọa độ Vignette
       const nxSqArr = new Float32Array(width);
       for (let x = 0; x < width; x++) {
         const nx = (x / width - 0.5) * 2;
@@ -1587,17 +1528,14 @@
           let g = data[idx + 1];
           let b = data[idx + 2];
 
-          // 1. Độ sáng, Nhiệt màu & Sắc độ
           r = r + brightOffset + warmR + tintR;
           g = g + brightOffset + warmG + tintG;
           b = b + brightOffset + warmB + tintB;
 
-          // 2. Tương phản (Contrast)
           r = contrastFactor * (r - 128) + 128;
           g = contrastFactor * (g - 128) + 128;
           b = contrastFactor * (b - 128) + 128;
 
-          // 3. Vùng sáng & Vùng tối + Split Toning
           const lumRaw = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
           const lum = lumRaw < 0 ? 0 : lumRaw > 1 ? 1 : lumRaw;
           const invLum = 1 - lum;
@@ -1615,7 +1553,6 @@
             b += shB * shWeight + hiB * hiWeight;
           }
 
-          // 4. Trộn màu HSL từng dải màu (Lightroom Color Mixer)
           if (hslLUT !== null) {
             const rn = r < 0 ? 0 : r > 255 ? 1 : r / 255;
             const gn = g < 0 ? 0 : g > 255 ? 1 : g / 255;
@@ -1625,12 +1562,9 @@
             const minC = rn < gn ? (rn < bn ? rn : bn) : (gn < bn ? gn : bn);
             const diff = maxC - minC;
 
-            // Chỉ xử lý điểm ảnh có màu sắc, bảo vệ vùng xám/trắng/đen khỏi nhiễu
             if (diff > 0.004) {
               const l = (maxC + minC) * 0.5;
               const s = l > 0.5 ? diff / (2 - maxC - minC) : diff / (maxC + minC);
-
-              // Khẩu độ bảo vệ vùng xám nhạt (smooth roll-off dưới s = 0.18)
               const satMask = s < 0.18 ? (s / 0.18) * (s / 0.18) : 1.0;
 
               let hNorm;
@@ -1648,7 +1582,6 @@
 
               const dHue = hslLUT.hueLUT[bin] * satMask;
               const dSat = hslLUT.satLUT[bin] * satMask;
-              // Bảo vệ vùng sáng gắt & tối sâu khi kéo Luminance
               const lumProtect = 1 - Math.abs(2 * l - 1) * 0.65;
               const dLum = hslLUT.lumLUT[bin] * satMask * lumProtect;
 
@@ -1676,7 +1609,6 @@
             }
           }
 
-          // 5. Độ bão hòa tổng thể (Saturation - đặt sau HSL để B&W mix hoạt động chuẩn)
           if (saturation !== 0) {
             const gray = 0.299 * r + 0.587 * g + 0.114 * b;
             r = gray + (r - gray) * satMult;
@@ -1684,14 +1616,12 @@
             b = gray + (b - gray) * satMult;
           }
 
-          // 6. Phai màu phim (Fade)
           if (fade > 0) {
             r = blackFloor + r * fadeScale;
             g = blackFloor + g * fadeScale;
             b = blackFloor + b * fadeScale;
           }
 
-          // 7. Hạt phim (Film Grain)
           if (grain > 0) {
             let hash = (x * 374761393 + y * 668265263) ^ (x * 1274126177);
             hash = ((hash ^ (hash >> 13)) * 1274126177) ^ (hash >> 16);
@@ -1702,7 +1632,6 @@
             b += noise;
           }
 
-          // 8. Tối 4 góc (Vignette)
           if (vignette > 0) {
             const distSq = nxSqArr[x] + nySq;
             if (distSq > 0.28) {
@@ -1723,9 +1652,7 @@
       return imageData;
     }
 
-    // ----------------------------------------------------------------------------
-    // 7. THUẬT TOÁN TỰ ĐỘNG CHỈNH MÀU AI (HISTOGRAM + TÔN DA HỒNG TỰ NHIÊN)
-    // ----------------------------------------------------------------------------
+    // 7. THUẬT TOÁN TỰ ĐỘNG CHỈNH MÀU AI
     function runAutoColorAI() {
       const w = previewSourceCanvas.width;
       const h = previewSourceCanvas.height;
@@ -1818,7 +1745,6 @@
         state.currentParams[def.key] = aiResult[def.key] || 0;
       });
 
-      // Kết hợp tinh chỉnh HSL nhẹ làm sáng da & trong bầu trời
       state.userHslOffsets = createEmptyHslMap();
       state.userHslOffsets.orange = { h: -3, s: -6, l: 16 };
       state.userHslOffsets.blue = { h: -8, s: 10, l: 6 };
@@ -1835,21 +1761,27 @@
       highlightActivePresetCard();
       renderPreview();
 
-      showToast(✨ AI đã cân bằng sáng (${autoBrightness >= 0 ? '+' : ''}${autoBrightness}), tôn da & tối ưu dải màu!);
+      showToast(`✨ AI đã cân bằng sáng (${autoBrightness >= 0 ? '+' : ''}${autoBrightness}), tôn da & tối ưu dải màu!`);
     }
 
-    // ----------------------------------------------------------------------------
-    // 8. QUẢN LÝ NGUỒN ẢNH, RESIZE KHUNG HÌNH & THUMBNAIL PRESETS
-    // ----------------------------------------------------------------------------
+    // 8. QUẢN LÝ NGUỒN ẢNH & KHUNG HÌNH
     function loadSourceFromCanvas(sourceCanvas) {
-      const w = sourceCanvas.width;
-      const h = sourceCanvas.height;
+      let w = sourceCanvas.width;
+      let h = sourceCanvas.height;
+
+      // Tự động thu nhỏ nếu vượt ngưỡng an toàn Safari iOS (tránh crash RAM trên ảnh 48MP)
+      if (Math.max(w, h) > MAX_SAFE_DIMENSION) {
+        const safeScale = MAX_SAFE_DIMENSION / Math.max(w, h);
+        w = Math.round(w * safeScale);
+        h = Math.round(h * safeScale);
+      }
+
       state.sourceWidth = w;
       state.sourceHeight = h;
 
       fullSourceCanvas.width = w;
       fullSourceCanvas.height = h;
-      fullSourceCtx.drawImage(sourceCanvas, 0, 0);
+      fullSourceCtx.drawImage(sourceCanvas, 0, 0, w, h);
 
       const maxPreviewDim = 960;
       const scale = Math.min(1, maxPreviewDim / Math.max(w, h));
@@ -1869,13 +1801,13 @@
       const thumbSize = 96;
       thumbSourceCanvas.width = thumbSize;
       thumbSourceCanvas.height = thumbSize;
-      const minSide = Math.min(w, h);
-      const sx = (w - minSide) / 2;
-      const sy = (h - minSide) / 2;
+      const minSide = Math.min(sourceCanvas.width, sourceCanvas.height);
+      const sx = (sourceCanvas.width - minSide) / 2;
+      const sy = (sourceCanvas.height - minSide) / 2;
       thumbSourceCtx.drawImage(sourceCanvas, sx, sy, minSide, minSide, 0, 0, thumbSize, thumbSize);
 
-      document.getElementById('imageDimensionsBadge').textContent = ${w} × ${h} px;
-      document.getElementById('exportResolutionText').textContent = ${w} × ${h} px (100% Gốc);
+      document.getElementById('imageDimensionsBadge').textContent = `${w} × ${h} px`;
+      document.getElementById('exportResolutionText').textContent = `${w} × ${h} px`;
 
       fitStageToViewport();
       renderAllPresetThumbnails();
@@ -1899,45 +1831,44 @@
         targetW = targetH * imgRatio;
       }
 
-      stage.style.width = ${Math.round(targetW)}px;
-      stage.style.height = ${Math.round(targetH)}px;
+      stage.style.width = `${Math.round(targetW)}px`;
+      stage.style.height = `${Math.round(targetH)}px`;
     }
 
     function handleUploadedFile(file) {
       if (!file || !file.type.startsWith('image/')) {
-        showToast('Vui lòng chọn tệp hình ảnh hợp lệ (JPG, PNG, WebP).');
+        showToast('Vui lòng chọn tệp hình ảnh hợp lệ.');
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const tempCanvas = document.createElement('canvas');
-          tempCanvas.width = img.naturalWidth || img.width;
-          tempCanvas.height = img.naturalHeight || img.height;
-          const tCtx = tempCanvas.getContext('2d');
-          tCtx.drawImage(img, 0, 0);
+      const objectUrl = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = img.naturalWidth || img.width;
+        tempCanvas.height = img.naturalHeight || img.height;
+        const tCtx = tempCanvas.getContext('2d');
+        tCtx.drawImage(img, 0, 0);
+        URL.revokeObjectURL(objectUrl);
 
-          document.querySelectorAll('.sample-btn').forEach(btn => {
-            btn.classList.remove('border-[#FF6B9D]/60', 'bg-[#FF6B9D]/15', 'text-white');
-            btn.classList.add('border-zinc-800', 'bg-zinc-900/90', 'text-zinc-300');
-          });
+        document.querySelectorAll('.sample-btn').forEach(btn => {
+          btn.classList.remove('border-[#FF6B9D]/60', 'bg-[#FF6B9D]/15', 'text-white');
+          btn.classList.add('border-zinc-800', 'bg-zinc-900/90', 'text-zinc-300');
+        });
 
-          loadSourceFromCanvas(tempCanvas);
-          showToast(Đã tải ảnh lên (${tempCanvas.width} × ${tempCanvas.height} px));
-        };
-        img.onerror = () => {
-          showToast('Không thể đọc tệp ảnh này. Vui lòng thử ảnh khác.');
-        };
-        img.src = e.target.result;
+        loadSourceFromCanvas(tempCanvas);
+        tempCanvas.width = 0;
+        tempCanvas.height = 0;
+        showToast(`Đã tải ảnh lên (${state.sourceWidth} × ${state.sourceHeight} px)`);
       };
-      reader.readAsDataURL(file);
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        showToast('Không thể đọc tệp ảnh này. Vui lòng thử ảnh khác.');
+      };
+      img.src = objectUrl;
     }
 
-    // ----------------------------------------------------------------------------
-    // 9. TÍNH TOÁN THÔNG SỐ TỔNG HỢP (BASIC + HSL) & RENDER PREVIEW
-    // ----------------------------------------------------------------------------
+    // 9. TÍNH TOÁN THÔNG SỐ & RENDER PREVIEW
     function recalculateEffectiveParams() {
       const preset = getAllPresets().find(p => p.id === state.activePresetId);
       const intensity = state.presetIntensity / 100;
@@ -2000,7 +1931,7 @@
       const h = thumbSourceCanvas.height;
       if (!w || !h) return;
 
-      const thumbCanvas = document.getElementById(preset-thumb-${preset.id});
+      const thumbCanvas = document.getElementById(`preset-thumb-${preset.id}`);
       if (!thumbCanvas) return;
       thumbCanvas.width = w;
       thumbCanvas.height = h;
@@ -2039,9 +1970,7 @@
       renderPreview();
     }
 
-    // ----------------------------------------------------------------------------
-    // 10. GIAO DIỆN 3 TAB, PRESET CARDS, BASIC SLIDERS & HSL COLOR MIXER
-    // ----------------------------------------------------------------------------
+    // 10. GIAO DIỆN 3 TAB, PRESET CARDS & BASIC SLIDERS
     function switchInspectorTab(tabName) {
       state.activeTab = tabName;
 
@@ -2059,7 +1988,7 @@
       document.querySelectorAll('.tab-panel').forEach(panel => {
         panel.classList.add('hidden');
       });
-      const activePanel = document.getElementById(tabPanel-${tabName});
+      const activePanel = document.getElementById(`tabPanel-${tabName}`);
       if (activePanel) activePanel.classList.remove('hidden');
     }
 
@@ -2106,7 +2035,7 @@
 
       filtered.forEach(preset => {
         const card = document.createElement('div');
-        card.id = preset-card-${preset.id};
+        card.id = `preset-card-${preset.id}`;
         card.setAttribute('role', 'button');
         card.setAttribute('tabindex', '0');
         card.className = 'preset-card group relative flex items-center gap-2.5 rounded-2xl border border-zinc-800/90 bg-[#1A1A21] p-2 text-left transition-all hover:border-zinc-700 cursor-pointer';
@@ -2160,7 +2089,7 @@
         card.classList.remove('border-[#FF6B9D]', 'bg-[#FF6B9D]/10', 'ring-1', 'ring-[#FF6B9D]/50');
         card.classList.add('border-zinc-800/90', 'bg-[#1A1A21]');
       });
-      const activeCard = document.getElementById(preset-card-${state.activePresetId});
+      const activeCard = document.getElementById(`preset-card-${state.activePresetId}`);
       if (activeCard) {
         activeCard.classList.remove('border-zinc-800/90', 'bg-[#1A1A21]');
         activeCard.classList.add('border-[#FF6B9D]', 'bg-[#FF6B9D]/10', 'ring-1', 'ring-[#FF6B9D]/50');
@@ -2173,8 +2102,8 @@
 
       ADJUSTMENT_DEFS.forEach(def => {
         const iconSvg = def.icon === 'vignette'
-          ? <svg class="h-3.5 w-3.5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="12" r="5"/></svg>
-          : <span class="text-xs">${def.icon}</span>;
+          ? `<svg class="h-3.5 w-3.5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="12" r="5"/></svg>`
+          : `<span class="text-xs">${def.icon}</span>`;
 
         const row = document.createElement('div');
         row.className = 'rounded-2xl border border-zinc-800/70 bg-[#1A1A21]/75 px-3.5 py-2.5 transition hover:border-zinc-700/80';
@@ -2189,7 +2118,7 @@
           <input id="slider-${def.key}" type="range" min="${def.min}" max="${def.max}" value="0" class="studio-slider" />
         `;
 
-        const sliderEl = row.querySelector(#slider-${def.key});
+        const sliderEl = row.querySelector(`#slider-${def.key}`);
         const labelEl = row.querySelector('label');
 
         sliderEl.addEventListener('input', (e) => {
@@ -2220,9 +2149,9 @@
     }
 
     function updateSingleSliderReadout(key, val) {
-      const valEl = document.getElementById(val-${key});
+      const valEl = document.getElementById(`val-${key}`);
       if (!valEl) return;
-      valEl.textContent = val > 0 ? +${val} : ${val};
+      valEl.textContent = val > 0 ? `+${val}` : `${val}`;
       if (val !== 0) {
         valEl.classList.remove('text-zinc-400');
         valEl.classList.add('text-[#FF6B9D]');
@@ -2235,15 +2164,13 @@
     function syncSlidersUI() {
       ADJUSTMENT_DEFS.forEach(def => {
         const val = state.currentParams[def.key] || 0;
-        const sliderEl = document.getElementById(slider-${def.key});
+        const sliderEl = document.getElementById(`slider-${def.key}`);
         if (sliderEl) sliderEl.value = val;
         updateSingleSliderReadout(def.key, val);
       });
     }
 
-    // ----------------------------------------------------------------------------
-    // 11. GIAO DIỆN & TƯƠNG TÁC TRỘN MÀU HSL (8 KÊNH MÀU LIGHTROOM)
-    // ----------------------------------------------------------------------------
+    // 11. GIAO DIỆN & TƯƠNG TÁC TRỘN MÀU HSL
     function buildHslUI() {
       const row = document.getElementById('hslSwatchesRow');
       row.innerHTML = '';
@@ -2251,7 +2178,7 @@
       HSL_CHANNELS.forEach(ch => {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.id = hsl-swatch-${ch.key};
+        btn.id = `hsl-swatch-${ch.key}`;
         btn.title = ch.name;
         btn.className = 'hsl-swatch-btn flex flex-col items-center gap-1 py-1 rounded-xl transition hover:bg-zinc-800/60';
         btn.innerHTML = `
@@ -2270,10 +2197,9 @@
         row.appendChild(btn);
       });
 
-      // Gắn sự kiện kéo 3 thanh Hue / Saturation / Luminance
       const bindHslSlider = (sliderId, propKey) => {
         const el = document.getElementById(sliderId);
-        const label = document.querySelector(label[for="${sliderId}"]);
+        const label = document.querySelector(`label[for="${sliderId}"]`);
 
         el.addEventListener('input', (e) => {
           const val = parseInt(e.target.value, 10);
@@ -2315,10 +2241,9 @@
       const chDef = HSL_CHANNELS.find(c => c.key === activeKey) || HSL_CHANNELS[1];
       const chVals = state.currentHsl[activeKey] || { h: 0, s: 0, l: 0 };
 
-      // Cập nhật vòng chọn & chấm báo hiệu trên cả 8 màu
       HSL_CHANNELS.forEach(ch => {
-        const btn = document.getElementById(hsl-swatch-${ch.key});
-        const dot = document.getElementById(hsl-dot-${ch.key});
+        const btn = document.getElementById(`hsl-swatch-${ch.key}`);
+        const dot = document.getElementById(`hsl-dot-${ch.key}`);
         if (!btn) return;
         const ring = btn.querySelector('.swatch-ring');
         const label = btn.querySelector('span:nth-child(2)');
@@ -2341,18 +2266,16 @@
         if (dot) dot.classList.toggle('opacity-0', !isModified);
       });
 
-      // Cập nhật tiêu đề màu đang chọn
       document.getElementById('selectedHslDot').style.backgroundColor = chDef.color;
       document.getElementById('selectedHslName').textContent = chDef.name;
       document.getElementById('selectedHslHint').textContent = chDef.hint;
       document.getElementById('hslHueLeftLabel').textContent = chDef.leftHue;
       document.getElementById('hslHueRightLabel').textContent = chDef.rightHue;
 
-      // Cập nhật 3 thanh trượt của màu đang chọn
       const updateHslReadout = (sliderId, valId, val) => {
         document.getElementById(sliderId).value = val;
         const vEl = document.getElementById(valId);
-        vEl.textContent = val > 0 ? +${val} : ${val};
+        vEl.textContent = val > 0 ? `+${val}` : `${val}`;
         vEl.classList.toggle('text-[#FF6B9D]', val !== 0);
         vEl.classList.toggle('text-zinc-400', val === 0);
       };
@@ -2362,9 +2285,7 @@
       updateHslReadout('hslLumSlider', 'hslLumVal', chVals.l);
     }
 
-    // ----------------------------------------------------------------------------
-    // 12. LƯU, XÓA & XUẤT/NHẬP MẪU MÀU CÁ NHÂN THEO TỪNG MÁY
-    // ----------------------------------------------------------------------------
+    // 12. LƯU, XÓA & XUẤT/NHẬP MẪU MÀU CÁ NHÂN
     function openSavePresetModal() {
       const modal = document.getElementById('savePresetModal');
       const input = document.getElementById('customPresetNameInput');
@@ -2383,7 +2304,7 @@
     function saveCurrentLookAsCustomPreset() {
       const input = document.getElementById('customPresetNameInput');
       const rawName = input.value.trim();
-      const presetName = rawName || Mẫu tự chỉnh #${customPresets.length + 1};
+      const presetName = rawName || `Mẫu tự chỉnh #${customPresets.length + 1}`;
 
       const newPreset = {
         id: 'custom_' + Date.now(),
@@ -2399,7 +2320,6 @@
       customPresets.unshift(newPreset);
       saveCustomPresetsToStorage();
 
-      // Đặt mẫu vừa lưu làm mẫu hiện hành ở mức 100%
       state.activePresetId = newPreset.id;
       state.presetIntensity = 100;
       ADJUSTMENT_DEFS.forEach(def => { state.userOffsets[def.key] = 0; });
@@ -2413,7 +2333,7 @@
       closeSavePresetModal();
       switchInspectorTab('presets');
       buildPresetsUI();
-      showToast(Đã lưu mẫu "${newPreset.name}" vào thiết bị này!);
+      showToast(`Đã lưu mẫu "${newPreset.name}" vào thiết bị này!`);
     }
 
     function deleteCustomPreset(presetId) {
@@ -2429,11 +2349,11 @@
       }
 
       buildPresetsUI();
-      showToastWithUndo(Đã xóa mẫu "${removed.name}", () => {
+      showToastWithUndo(`Đã xóa mẫu "${removed.name}"`, () => {
         customPresets.splice(idx, 0, removed);
         saveCustomPresetsToStorage();
         buildPresetsUI();
-        showToast(Đã khôi phục mẫu "${removed.name}");
+        showToast(`Đã khôi phục mẫu "${removed.name}"`);
       });
     }
 
@@ -2452,12 +2372,12 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = hypic-presets-backup-${Date.now()}.json;
+      a.download = `hypic-presets-backup-${Date.now()}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 1500);
-      showToast(Đã xuất ${customPresets.length} mẫu màu ra file JSON!);
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+      showToast(`Đã xuất ${customPresets.length} mẫu màu ra file JSON!`);
     }
 
     function handleImportPresetsJson(file) {
@@ -2491,7 +2411,7 @@
 
           saveCustomPresetsToStorage();
           buildPresetsUI();
-          showToast(Đã nhập thành công ${added} mẫu màu vào máy!);
+          showToast(`Đã nhập thành công ${added} mẫu màu vào máy!`);
         } catch (err) {
           showToast('Lỗi đọc file JSON. Vui lòng kiểm tra lại tệp.');
         }
@@ -2499,9 +2419,7 @@
       reader.readAsText(file);
     }
 
-    // ----------------------------------------------------------------------------
-    // 13. TƯƠNG TÁC SO SÁNH TRƯỚC / SAU (SPLIT SLIDER & HOLD TO COMPARE)
-    // ----------------------------------------------------------------------------
+    // 13. SO SÁNH TRƯỚC / SAU (SPLIT SLIDER & HOLD TO COMPARE)
     function updateSplitClipUI() {
       const beforeLayer = document.getElementById('beforeClipLayer');
       const divider = document.getElementById('splitDivider');
@@ -2527,9 +2445,9 @@
         labelAfter.classList.add('opacity-0');
       } else {
         const rightInset = 100 - state.splitPercent;
-        beforeLayer.style.clipPath = inset(0 ${rightInset}% 0 0);
+        beforeLayer.style.clipPath = `inset(0 ${rightInset}% 0 0)`;
         divider.classList.remove('hidden');
-        divider.style.left = ${state.splitPercent}%;
+        divider.style.left = `${state.splitPercent}%`;
         labelBefore.classList.toggle('opacity-0', state.splitPercent < 12);
         labelAfter.classList.toggle('opacity-0', state.splitPercent > 88);
       }
@@ -2615,9 +2533,7 @@
       });
     }
 
-    // ----------------------------------------------------------------------------
-    // 14. XUẤT FILE ẢNH CHẤT LƯỢNG GỐC (100% RESOLUTION) & THÔNG BÁO TOAST
-    // ----------------------------------------------------------------------------
+    // 14. XUẤT FILE ẢNH (TƯƠNG THÍCH CẢ DESKTOP & IPHONE SAFARI)
     function exportFullResolutionImage() {
       const w = fullSourceCanvas.width;
       const h = fullSourceCanvas.height;
@@ -2638,22 +2554,36 @@
       const quality = mime === 'image/jpeg' ? 0.95 : undefined;
 
       exportCanvas.toBlob((blob) => {
+        // Giải phóng RAM Canvas ngay lập tức
+        exportCanvas.width = 0;
+        exportCanvas.height = 0;
+
         if (!blob) {
           showToast('Có lỗi khi tạo tệp ảnh. Vui lòng thử lại.');
           return;
         }
+
+        if (state.lastExportObjectUrl) {
+          URL.revokeObjectURL(state.lastExportObjectUrl);
+        }
         const url = URL.createObjectURL(blob);
+        state.lastExportObjectUrl = url;
+
+        // Hiển thị ảnh xem trước ngay trong modal để iPhone nhấn giữ -> Lưu vào Ảnh
+        const iosBox = document.getElementById('iosExportResultBox');
+        const iosImg = document.getElementById('iosExportPreviewImg');
+        iosImg.src = url;
+        iosBox.classList.remove('hidden');
+
+        // Kích hoạt tải xuống cho trình duyệt hỗ trợ
         const a = document.createElement('a');
         a.href = url;
-        a.download = hypic-studio-${state.activePresetId}-${Date.now()}.${ext};
+        a.download = `hypic-studio-${state.activePresetId}-${Date.now()}.${ext}`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(url), 2000);
 
-        document.getElementById('exportModal').classList.add('hidden');
-        document.getElementById('exportModal').classList.remove('flex');
-        showToast(Đã lưu ảnh ${w}×${h}px (${ext.toUpperCase()}) thành công!);
+        showToast(`Đã tạo ảnh ${w}×${h}px (${ext.toUpperCase()})!`);
       }, mime, quality);
     }
 
@@ -2701,9 +2631,7 @@
       }, 4500);
     }
 
-    // ----------------------------------------------------------------------------
-    // 15. KHỞI CHẠY ỨNG DỤNG & GẮN TOÀN BỘ SỰ KIỆN
-    // ----------------------------------------------------------------------------
+    // 15. KHỞI CHẠY ỨNG DỤNG
     window.addEventListener('DOMContentLoaded', () => {
       loadCustomPresetsFromStorage();
       buildPresetsUI();
@@ -2711,17 +2639,14 @@
       buildHslUI();
       initSplitComparisonInteractions();
 
-      // Nạp ảnh mẫu mặc định đầu tiên (Hoàng Hôn)
       const initialSampleCanvas = document.createElement('canvas');
       SampleArtworkGenerator.renderSample('sunset_muse', initialSampleCanvas);
       loadSourceFromCanvas(initialSampleCanvas);
 
-      // Chuyển đổi 3 Tab điều khiển
       document.querySelectorAll('.inspector-tab-btn').forEach(btn => {
         btn.addEventListener('click', () => switchInspectorTab(btn.dataset.tab));
       });
 
-      // Bộ lọc danh mục Mẫu màu (Tất cả / Của tôi / Lightroom / Hypic & Film)
       document.querySelectorAll('.preset-cat-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           state.activePresetCategory = btn.dataset.cat;
@@ -2735,7 +2660,6 @@
         });
       });
 
-      // Chuyển đổi 3 ảnh mẫu tích hợp
       document.querySelectorAll('.sample-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const sampleKey = btn.dataset.sample;
@@ -2754,11 +2678,10 @@
         });
       });
 
-      // Thanh trượt Cường độ mẫu màu (0% - 100%)
       const intensitySlider = document.getElementById('presetIntensitySlider');
       intensitySlider.addEventListener('input', (e) => {
         state.presetIntensity = parseInt(e.target.value, 10);
-        document.getElementById('presetIntensityVal').textContent = ${state.presetIntensity}%;
+        document.getElementById('presetIntensityVal').textContent = `${state.presetIntensity}%`;
         recalculateEffectiveParams();
         syncSlidersUI();
         syncHslUI();
@@ -2766,10 +2689,8 @@
         renderPreview();
       });
 
-      // Nút Tự Động Chỉnh Màu AI
       document.getElementById('autoColorBtn').addEventListener('click', runAutoColorAI);
 
-      // Nút Đặt lại toàn bộ / Cơ bản / HSL
       document.getElementById('resetAllBtn').addEventListener('click', () => {
         applyPreset('original');
         showToast('Đã đặt lại toàn bộ về ảnh gốc.');
@@ -2792,7 +2713,7 @@
         updateModifiedBadges();
         renderPreview();
         const chDef = HSL_CHANNELS.find(c => c.key === chKey);
-        showToast(Đã đặt lại kênh màu ${chDef ? chDef.name : chKey}.);
+        showToast(`Đã đặt lại kênh màu ${chDef ? chDef.name : chKey}.`);
       });
 
       document.getElementById('resetAllHslBtn').addEventListener('click', () => {
@@ -2806,7 +2727,6 @@
         showToast('Đã đặt lại toàn bộ 8 kênh Trộn màu HSL.');
       });
 
-      // Modal Lưu Mẫu Màu Cá Nhân
       document.getElementById('openSavePresetBtn').addEventListener('click', openSavePresetModal);
       document.getElementById('inlineSavePresetBtn').addEventListener('click', openSavePresetModal);
       document.getElementById('closeSavePresetModalBtn').addEventListener('click', closeSavePresetModal);
@@ -2831,7 +2751,6 @@
         if (e.key === 'Enter') saveCurrentLookAsCustomPreset();
       });
 
-      // Xuất / Nhập file JSON mẫu màu cá nhân
       document.getElementById('exportJsonPresetsBtn').addEventListener('click', exportCustomPresetsJson);
       const importInput = document.getElementById('importPresetsInput');
       document.getElementById('importJsonPresetsBtn').addEventListener('click', () => importInput.click());
@@ -2842,7 +2761,6 @@
         }
       });
 
-      // Tải ảnh lên & Drag-and-Drop toàn trang
       const fileInput = document.getElementById('imageFileInput');
       document.getElementById('uploadBtn').addEventListener('click', () => fileInput.click());
       fileInput.addEventListener('change', (e) => {
@@ -2880,9 +2798,9 @@
         }
       });
 
-      // Modal Xuất Ảnh
       const exportModal = document.getElementById('exportModal');
       document.getElementById('openExportBtn').addEventListener('click', () => {
+        document.getElementById('iosExportResultBox').classList.add('hidden');
         exportModal.classList.remove('hidden');
         exportModal.classList.add('flex');
       });
@@ -2911,7 +2829,6 @@
 
       document.getElementById('confirmDownloadBtn').addEventListener('click', exportFullResolutionImage);
 
-      // Tự động điều chỉnh kích thước khung ảnh khi xoay màn hình / đổi cỡ cửa sổ
       window.addEventListener('resize', fitStageToViewport);
     });
   </script>
