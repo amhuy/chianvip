@@ -1,0 +1,2919 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Hypic Studio - Chỉnh Màu Ảnh Tự Động</title>
+
+  <!-- iOS Safari PWA Full-Screen Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Hypic Studio" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#09090B" />
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+          colors: {
+            hypic: {
+              pink: '#FF6B9D',
+              purple: '#8B5CF6',
+              dark: '#09090B',
+              panel: '#121216',
+              card: '#1A1A21',
+              border: '#272732',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #09090B;
+      color: #F4F4F5;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    /* Custom subtle scrollbar */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #121216;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2E2E3A;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #FF6B9D;
+    }
+
+    /* Hypic Gradient Brand Text & Buttons */
+    .hypic-gradient {
+      background: linear-gradient(135deg, #FF6B9D 0%, #C084FC 50%, #8B5CF6 100%);
+    }
+    .hypic-gradient-text {
+      background: linear-gradient(135deg, #FF6B9D 0%, #D8B4FE 55%, #8B5CF6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hypic-glow {
+      box-shadow: 0 8px 28px -6px rgba(255, 107, 157, 0.35), 0 4px 16px -4px rgba(139, 92, 246, 0.3);
+    }
+
+    /* Custom Precision Range Slider */
+    input[type="range"].studio-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 5px;
+      border-radius: 9999px;
+      background: #272732;
+      outline: none;
+      cursor: pointer;
+    }
+
+    input[type="range"].studio-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: 2.5px solid #FF6B9D;
+      box-shadow: 0 0 10px rgba(255, 107, 157, 0.6);
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    input[type="range"].studio-slider::-webkit-slider-thumb:hover,
+    input[type="range"].studio-slider:active::-webkit-slider-thumb {
+      transform: scale(1.18);
+      box-shadow: 0 0 14px rgba(255, 107, 157, 0.95);
+    }
+
+    input[type="range"].studio-slider::-moz-range-thumb {
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: 2.5px solid #FF6B9D;
+      box-shadow: 0 0 10px rgba(255, 107, 157, 0.6);
+      cursor: pointer;
+      transition: transform 0.12s ease;
+    }
+
+    /* HSL Gradient Track Hints */
+    input[type="range"].hsl-hue-track {
+      background: linear-gradient(90deg, #3B82F6 0%, #10B981 25%, #EAB308 50%, #F97316 75%, #EC4899 100%);
+      height: 5px;
+    }
+    input[type="range"].hsl-sat-track {
+      background: linear-gradient(90deg, #3F3F46 0%, #FF6B9D 100%);
+      height: 5px;
+    }
+    input[type="range"].hsl-lum-track {
+      background: linear-gradient(90deg, #18181B 0%, #71717A 50%, #FAFAFA 100%);
+      height: 5px;
+    }
+
+    /* Checkerboard subtle studio background behind transparent images */
+    .studio-checkerboard {
+      background-image:
+        linear-gradient(45deg, #141419 25%, transparent 25%),
+        linear-gradient(-45deg, #141419 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #141419 75%),
+        linear-gradient(-45deg, transparent 75%, #141419 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+    }
+
+    /* AI Sparkle Shimmer */
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 18px rgba(255, 107, 157, 0.35), 0 0 32px rgba(139, 92, 246, 0.2); }
+      50% { box-shadow: 0 0 26px rgba(255, 107, 157, 0.65), 0 0 42px rgba(139, 92, 246, 0.45); }
+    }
+    .ai-btn-glow {
+      animation: pulseGlow 3s infinite ease-in-out;
+    }
+
+    /* Hide scrollbar for horizontal strips on mobile */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen lg:h-screen lg:overflow-hidden flex flex-col select-none">
+
+  <!-- Hidden File Inputs -->
+  <input type="file" id="imageFileInput" accept="image/jpeg,image/png,image/webp" class="hidden" />
+  <input type="file" id="importPresetsInput" accept="application/json,.json" class="hidden" />
+
+  <!-- Drag & Drop Overlay -->
+  <div id="dropOverlay" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-6">
+    <div class="w-full max-w-md rounded-3xl border-2 border-dashed border-[#FF6B9D] bg-[#121216]/90 p-10 text-center shadow-2xl">
+      <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl hypic-gradient text-white shadow-lg">
+        <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+        </svg>
+      </div>
+      <h3 class="text-xl font-bold text-white">Thả ảnh vào đây để chỉnh màu</h3>
+      <p class="mt-2 text-sm text-zinc-400">Hỗ trợ JPG, PNG, WebP chất lượng cao • Xử lý trực tiếp trên trình duyệt</p>
+    </div>
+  </div>
+
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-30 border-b border-zinc-800/80 bg-[#121216]/95 backdrop-blur-md px-3 sm:px-6 py-2.5">
+    <div class="mx-auto flex max-w-[1720px] flex-wrap items-center justify-between gap-2">
+      <!-- Brand Identity -->
+      <div class="flex items-center gap-2.5">
+        <div class="flex h-9 w-9 items-center justify-center rounded-xl hypic-gradient shadow-md shrink-0">
+          <svg class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h1 class="text-sm sm:text-lg font-bold tracking-tight text-white">
+              Hypic <span class="hypic-gradient-text">Studio</span>
+            </h1>
+            <span class="hidden sm:inline-flex items-center rounded-full border border-[#FF6B9D]/30 bg-[#FF6B9D]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#FF6B9D]">
+              Pro Color
+            </span>
+          </div>
+          <p class="hidden xl:block text-[11px] text-zinc-400">Chỉnh Màu AI • Trộn Màu HSL &amp; Mẫu Lightroom</p>
+        </div>
+      </div>
+
+      <!-- Built-in Sample Photo Switcher Pills -->
+      <div class="order-3 lg:order-2 flex w-full lg:w-auto items-center justify-center gap-1.5 overflow-x-auto no-scrollbar pt-1 lg:pt-0">
+        <span class="hidden xl:inline text-xs font-medium text-zinc-500 mr-1">Ảnh mẫu:</span>
+        <button type="button" data-sample="sunset_muse" class="sample-btn active-sample flex items-center gap-1.5 rounded-xl border border-[#FF6B9D]/60 bg-[#FF6B9D]/15 px-2.5 py-1.5 text-xs font-medium text-white transition hover:bg-[#FF6B9D]/25 shrink-0">
+          <span class="h-2 w-2 rounded-full bg-[#FF6B9D]"></span>
+          Hoàng Hôn
+        </button>
+        <button type="button" data-sample="twilight_cafe" class="sample-btn flex items-center gap-1.5 rounded-xl border border-zinc-800 bg-zinc-900/90 px-2.5 py-1.5 text-xs font-medium text-zinc-300 transition hover:border-zinc-700 hover:text-white shrink-0">
+          <span class="h-2 w-2 rounded-full bg-amber-400"></span>
+          Phố Cà Phê
+        </button>
+        <button type="button" data-sample="pastel_blossoms" class="sample-btn flex items-center gap-1.5 rounded-xl border border-zinc-800 bg-zinc-900/90 px-2.5 py-1.5 text-xs font-medium text-zinc-300 transition hover:border-zinc-700 hover:text-white shrink-0">
+          <span class="h-2 w-2 rounded-full bg-purple-400"></span>
+          Hoa Pastel
+        </button>
+      </div>
+
+      <!-- Top Action Buttons: Upload, Save Preset, Reset, Export -->
+      <div class="order-2 lg:order-3 flex items-center gap-1.5 sm:gap-2">
+        <button id="uploadBtn" type="button" class="flex items-center gap-1.5 rounded-xl border border-zinc-700/80 bg-zinc-800/80 px-2.5 sm:px-3 py-2 text-xs sm:text-sm font-medium text-zinc-100 transition hover:border-[#FF6B9D]/60 hover:bg-zinc-800 active:scale-95">
+          <svg class="h-4 w-4 text-[#FF6B9D]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+          </svg>
+          <span>Tải ảnh</span>
+        </button>
+
+        <button id="openSavePresetBtn" type="button" class="flex items-center gap-1 rounded-xl border border-[#FF6B9D]/60 bg-[#FF6B9D]/15 px-2.5 sm:px-3 py-2 text-xs sm:text-sm font-semibold text-[#FF6B9D] transition hover:bg-[#FF6B9D]/25 hover:text-white active:scale-95">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.3">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>Lưu mẫu</span>
+        </button>
+
+        <button id="resetAllBtn" type="button" title="Đặt lại toàn bộ thông số" class="flex items-center gap-1.5 rounded-xl border border-zinc-800 bg-zinc-900 p-2 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-zinc-300 transition hover:border-zinc-700 hover:text-white active:scale-95">
+          <svg class="h-4 w-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span class="hidden md:inline">Đặt lại</span>
+        </button>
+
+        <button id="openExportBtn" type="button" class="flex items-center gap-1.5 rounded-xl hypic-gradient px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-white hypic-glow transition hover:opacity-95 active:scale-95">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          <span>Xuất ảnh</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Studio Workspace -->
+  <main class="flex-1 flex flex-col lg:flex-row lg:overflow-hidden">
+    
+    <!-- LEFT / CENTER: Canvas Viewport & Before/After Split Comparison -->
+    <section class="relative flex-1 flex flex-col items-center justify-between bg-[#09090B] p-3 sm:p-5 lg:p-6 overflow-hidden">
+      <!-- Subtle ambient studio backlight -->
+      <div class="pointer-events-none absolute inset-0 flex items-center justify-center opacity-25">
+        <div class="h-72 w-72 rounded-full bg-[#FF6B9D]/20 blur-[110px]"></div>
+        <div class="h-72 w-72 rounded-full bg-[#8B5CF6]/20 blur-[110px] -ml-16"></div>
+      </div>
+
+      <!-- Top Image Metadata & Quick Hint Bar -->
+      <div class="relative z-10 flex w-full max-w-4xl items-center justify-between gap-2 pb-2 text-xs text-zinc-400">
+        <div class="flex items-center gap-2 min-w-0">
+          <span id="imageDimensionsBadge" class="rounded-lg border border-zinc-800 bg-[#121216]/90 px-2.5 py-1 font-mono text-[11px] text-zinc-300 shrink-0">
+            1080 × 1350 px
+          </span>
+          <span id="activePresetBadge" class="truncate rounded-lg border border-[#FF6B9D]/30 bg-[#FF6B9D]/10 px-2.5 py-1 text-[11px] font-medium text-[#FF6B9D]">
+            Gốc
+          </span>
+        </div>
+        <div class="hidden sm:flex items-center gap-1.5 text-[11px] text-zinc-500 shrink-0">
+          <span>Giữ phím</span>
+          <kbd class="rounded border border-zinc-700 bg-zinc-800 px-1.5 py-0.5 font-mono text-[10px] text-zinc-300">Space</kbd>
+          <span>để xem ảnh gốc</span>
+        </div>
+      </div>
+
+      <!-- Central Image Stage Container -->
+      <div id="viewportContainer" class="relative z-10 flex-1 w-full flex items-center justify-center min-h-[260px] max-h-[46vh] sm:max-h-[54vh] lg:max-h-none my-1">
+        <div id="stageWrapper" class="relative overflow-hidden rounded-2xl border border-zinc-800/90 studio-checkerboard shadow-[0_20px_60px_rgba(0,0,0,0.85)] transition-shadow duration-300">
+          <!-- Edited Image Canvas (Full Layer) -->
+          <canvas id="editedCanvas" class="block w-full h-full"></canvas>
+
+          <!-- Original Image Canvas (Clipped Before Layer) -->
+          <div id="beforeClipLayer" class="absolute inset-0 overflow-hidden pointer-events-none" style="clip-path: inset(0 50% 0 0);">
+            <canvas id="originalCanvas" class="block w-full h-full"></canvas>
+          </div>
+
+          <!-- Corner Labels for Split Mode -->
+          <div id="labelBefore" class="pointer-events-none absolute top-3 left-3 rounded-lg bg-black/65 backdrop-blur-md border border-white/10 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-zinc-200 transition-opacity duration-200">
+            Trước
+          </div>
+          <div id="labelAfter" class="pointer-events-none absolute top-3 right-3 rounded-lg bg-[#FF6B9D]/80 backdrop-blur-md border border-white/20 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-white transition-opacity duration-200">
+            Sau
+          </div>
+
+          <!-- Hold-to-View Original Banner -->
+          <div id="holdingOriginalBanner" class="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 hidden rounded-full bg-black/80 backdrop-blur-md border border-white/15 px-3.5 py-1 text-xs font-medium text-white shadow-lg">
+            Đang hiển thị ảnh gốc
+          </div>
+
+          <!-- Interactive Split-Screen Divider Handle -->
+          <div id="splitDivider" class="absolute top-0 bottom-0 z-20 w-9 -ml-4.5 cursor-ew-resize touch-none flex items-center justify-center group" style="left: 50%; margin-left: -18px;">
+            <div class="h-full w-[2px] bg-white/90 shadow-[0_0_10px_rgba(255,107,157,0.9)] group-hover:bg-[#FF6B9D] transition-colors"></div>
+            <div class="absolute flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-[#121216]/90 text-white shadow-[0_0_16px_rgba(0,0,0,0.8)] group-hover:scale-110 group-hover:border-[#FF6B9D] transition-all">
+              <svg class="h-4 w-4 text-[#FF6B9D]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l-3 3 3 3m8-6l3 3-3 3" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Floating Studio Action Bar -->
+      <div class="relative z-10 mt-2.5 flex flex-wrap items-center justify-center gap-2 sm:gap-3 rounded-2xl border border-zinc-800/90 bg-[#121216]/95 backdrop-blur-md p-2 shadow-xl">
+        <!-- Magic AI Auto Color Button -->
+        <button id="autoColorBtn" type="button" class="ai-btn-glow flex items-center gap-1.5 rounded-xl hypic-gradient px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:brightness-110 active:scale-95">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+          </svg>
+          <span>✨ Tự Động Chỉnh Màu</span>
+        </button>
+
+        <!-- Toggle Split Screen Before/After -->
+        <button id="toggleSplitBtn" type="button" class="flex items-center gap-1.5 rounded-xl border border-[#FF6B9D]/50 bg-[#FF6B9D]/15 px-3 sm:px-3.5 py-2.5 text-xs sm:text-sm font-medium text-white transition hover:bg-[#FF6B9D]/25 active:scale-95">
+          <svg class="h-4 w-4 text-[#FF6B9D]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 3v18m6-18v18M4 7h16M4 17h16" />
+          </svg>
+          <span>Chia đôi</span>
+        </button>
+
+        <!-- Hold to Compare Original Button -->
+        <button id="holdOriginalBtn" type="button" class="flex items-center gap-1.5 rounded-xl border border-zinc-700/80 bg-zinc-800/90 px-3 sm:px-3.5 py-2.5 text-xs sm:text-sm font-medium text-zinc-200 transition hover:border-zinc-600 hover:text-white active:bg-[#8B5CF6]/30 active:border-[#8B5CF6]">
+          <svg class="h-4 w-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+          <span>Xem ảnh gốc</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- RIGHT / BOTTOM INSPECTOR PANEL: 3-Tab Studio Controls -->
+    <aside class="w-full lg:w-[430px] xl:w-[460px] shrink-0 border-t lg:border-t-0 lg:border-l border-zinc-800/90 bg-[#121216] flex flex-col lg:h-full overflow-hidden">
+      
+      <!-- 3-Tab Navigation Header -->
+      <div class="sticky top-0 z-20 border-b border-zinc-800/90 bg-[#121216] px-3 sm:px-4 pt-3 pb-2.5">
+        <div class="grid grid-cols-3 gap-1.5 rounded-2xl bg-[#09090B] p-1 border border-zinc-800/80">
+          <button type="button" data-tab="presets" class="inspector-tab-btn active-tab flex items-center justify-center gap-1.5 rounded-xl py-2 px-2 text-xs sm:text-sm font-semibold transition-all bg-[#1A1A21] text-white shadow-sm border border-[#FF6B9D]/40">
+            <span>🎨 Mẫu màu</span>
+            <span id="presetTotalBadge" class="rounded-full bg-[#FF6B9D]/20 px-1.5 py-0.2 text-[10px] font-mono text-[#FF6B9D]">20</span>
+          </button>
+
+          <button type="button" data-tab="basic" class="inspector-tab-btn flex items-center justify-center gap-1.5 rounded-xl py-2 px-2 text-xs sm:text-sm font-medium text-zinc-400 transition-all hover:text-zinc-200 border border-transparent">
+            <span>☀️ Cơ bản</span>
+            <span id="basicModifiedDot" class="hidden h-1.5 w-1.5 rounded-full bg-[#FF6B9D]"></span>
+          </button>
+
+          <button type="button" data-tab="hsl" class="inspector-tab-btn flex items-center justify-center gap-1.5 rounded-xl py-2 px-2 text-xs sm:text-sm font-medium text-zinc-400 transition-all hover:text-zinc-200 border border-transparent">
+            <span>🌈 Trộn màu HSL</span>
+            <span id="hslModifiedDot" class="hidden h-1.5 w-1.5 rounded-full bg-[#8B5CF6]"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Scrollable Tab Content Area -->
+      <div class="flex-1 overflow-y-auto p-4 sm:p-5">
+
+        <!-- ================================================================ -->
+        <!-- TAB 1: MẪU MÀU (20 PRESETS + CUSTOM SAVED PRESETS ON DEVICE)      -->
+        <!-- ================================================================ -->
+        <div id="tabPanel-presets" class="tab-panel space-y-4">
+          <!-- Preset Intensity Slider -->
+          <div class="rounded-2xl border border-zinc-800/90 bg-[#1A1A21] p-3">
+            <div class="flex items-center justify-between text-xs mb-2">
+              <span class="font-medium text-zinc-300">Cường độ mẫu màu (Cơ bản + HSL)</span>
+              <span id="presetIntensityVal" class="font-mono font-semibold text-[#FF6B9D]">100%</span>
+            </div>
+            <input id="presetIntensitySlider" type="range" min="0" max="100" value="100" class="studio-slider" />
+          </div>
+
+          <!-- Category Filter Pills + Quick Save Button -->
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+              <button type="button" data-cat="all" class="preset-cat-btn active-cat rounded-xl border border-[#FF6B9D]/60 bg-[#FF6B9D]/15 px-2.5 py-1.5 text-xs font-semibold text-white shrink-0 transition">
+                Tất cả
+              </button>
+              <button type="button" data-cat="custom" class="preset-cat-btn flex items-center gap-1 rounded-xl border border-zinc-800 bg-[#1A1A21] px-2.5 py-1.5 text-xs font-medium text-zinc-300 hover:border-zinc-700 shrink-0 transition">
+                <span>Của tôi</span>
+                <span id="customCountBadge" class="rounded-full bg-zinc-800 px-1.5 text-[10px] font-mono text-[#FF6B9D]">0</span>
+              </button>
+              <button type="button" data-cat="lightroom" class="preset-cat-btn rounded-xl border border-zinc-800 bg-[#1A1A21] px-2.5 py-1.5 text-xs font-medium text-zinc-300 hover:border-zinc-700 shrink-0 transition">
+                Lightroom
+              </button>
+              <button type="button" data-cat="hypic" class="preset-cat-btn rounded-xl border border-zinc-800 bg-[#1A1A21] px-2.5 py-1.5 text-xs font-medium text-zinc-300 hover:border-zinc-700 shrink-0 transition">
+                Hypic &amp; Film
+              </button>
+            </div>
+          </div>
+
+          <!-- Custom Presets Toolbar (Shown when "Của tôi" is active or always accessible) -->
+          <div id="customPresetsToolbar" class="hidden rounded-2xl border border-zinc-800/90 bg-[#1A1A21]/90 p-3 space-y-2.5">
+            <div class="flex items-center justify-between gap-2">
+              <div class="text-xs text-zinc-300 font-medium">Mẫu lưu trên thiết bị này</div>
+              <button type="button" id="inlineSavePresetBtn" class="flex items-center gap-1 rounded-xl hypic-gradient px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:brightness-110 active:scale-95">
+                <span>+ Lưu mẫu hiện tại</span>
+              </button>
+            </div>
+            <div class="flex items-center gap-2 pt-1 border-t border-zinc-800/80">
+              <button type="button" id="exportJsonPresetsBtn" class="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-zinc-700/80 bg-zinc-800/80 py-1.5 px-2.5 text-[11px] font-medium text-zinc-200 hover:border-zinc-600 hover:text-white">
+                <svg class="h-3.5 w-3.5 text-[#FF6B9D]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                <span>Xuất file JSON</span>
+              </button>
+              <button type="button" id="importJsonPresetsBtn" class="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-zinc-700/80 bg-zinc-800/80 py-1.5 px-2.5 text-[11px] font-medium text-zinc-200 hover:border-zinc-600 hover:text-white">
+                <svg class="h-3.5 w-3.5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                <span>Nhập file JSON</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Presets Grid -->
+          <div id="presetsGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2.5 pb-6">
+            <!-- Preset cards dynamically rendered by JS -->
+          </div>
+        </div>
+
+        <!-- ================================================================ -->
+        <!-- TAB 2: CƠ BẢN (10 MANUAL BASIC ADJUSTMENTS)                      -->
+        <!-- ================================================================ -->
+        <div id="tabPanel-basic" class="tab-panel hidden space-y-3.5 pb-6">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Ánh sáng &amp; Sắc thái tổng thể</span>
+            <button id="resetAdjustmentsBtn" type="button" class="text-xs font-medium text-[#FF6B9D] hover:underline">
+              Đặt lại Cơ bản
+            </button>
+          </div>
+          <div id="slidersContainer" class="space-y-3">
+            <!-- 10 sliders dynamically rendered by JS -->
+          </div>
+        </div>
+
+        <!-- ================================================================ -->
+        <!-- TAB 3: TRỘN MÀU HSL (LIGHTROOM 8-CHANNEL COLOR MIXER)            -->
+        <!-- ================================================================ -->
+        <div id="tabPanel-hsl" class="tab-panel hidden space-y-4 pb-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-300">Trộn Màu Từng Kênh (HSL)</h3>
+              <p class="text-[11px] text-zinc-400 mt-0.5">Chạm vào vòng màu để tinh chỉnh riêng dải màu đó</p>
+            </div>
+            <button id="resetAllHslBtn" type="button" class="text-xs font-medium text-[#FF6B9D] hover:underline shrink-0">
+              Đặt lại tất cả HSL
+            </button>
+          </div>
+
+          <!-- 8 Circular Color Channel Swatches -->
+          <div class="rounded-2xl border border-zinc-800/90 bg-[#1A1A21] p-3.5">
+            <div id="hslSwatchesRow" class="grid grid-cols-8 gap-1.5 sm:gap-2">
+              <!-- 8 swatches injected by JS -->
+            </div>
+
+            <!-- Selected Color Channel Header & Single Channel Reset -->
+            <div class="mt-4 pt-3 border-t border-zinc-800/80 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span id="selectedHslDot" class="h-3.5 w-3.5 rounded-full border border-white/40 shadow-sm" style="background-color: #F97316;"></span>
+                <div>
+                  <span id="selectedHslName" class="text-sm font-bold text-white">Cam (Orange)</span>
+                  <span id="selectedHslHint" class="block text-[11px] text-zinc-400">Tông da &amp; ánh nắng ấm</span>
+                </div>
+              </div>
+              <button id="resetSingleHslBtn" type="button" class="rounded-xl border border-zinc-700/80 bg-zinc-800/80 px-2.5 py-1.5 text-[11px] font-medium text-zinc-300 hover:border-zinc-600 hover:text-white active:scale-95">
+                Đặt lại màu này
+              </button>
+            </div>
+          </div>
+
+          <!-- 3 Precision Sliders for Active Color Channel (Hue, Saturation, Luminance) -->
+          <div class="space-y-3">
+            <!-- Hue -->
+            <div class="rounded-2xl border border-zinc-800/80 bg-[#1A1A21]/85 p-3.5">
+              <div class="flex items-center justify-between text-xs mb-2">
+                <label for="hslHueSlider" class="font-medium text-zinc-200 cursor-pointer" title="Nhấp đúp để đặt lại 0">
+                  Sắc độ (Hue)
+                </label>
+                <span id="hslHueVal" class="font-mono text-xs font-semibold text-zinc-400">0</span>
+              </div>
+              <input id="hslHueSlider" type="range" min="-100" max="100" value="0" class="studio-slider hsl-hue-track" />
+              <div class="flex justify-between text-[10px] text-zinc-500 mt-1.5">
+                <span id="hslHueLeftLabel">Đỏ hồng</span>
+                <span>Chuẩn</span>
+                <span id="hslHueRightLabel">Vàng ấm</span>
+              </div>
+            </div>
+
+            <!-- Saturation -->
+            <div class="rounded-2xl border border-zinc-800/80 bg-[#1A1A21]/85 p-3.5">
+              <div class="flex items-center justify-between text-xs mb-2">
+                <label for="hslSatSlider" class="font-medium text-zinc-200 cursor-pointer" title="Nhấp đúp để đặt lại 0">
+                  Độ bão hòa (Saturation)
+                </label>
+                <span id="hslSatVal" class="font-mono text-xs font-semibold text-zinc-400">0</span>
+              </div>
+              <input id="hslSatSlider" type="range" min="-100" max="100" value="0" class="studio-slider hsl-sat-track" />
+              <div class="flex justify-between text-[10px] text-zinc-500 mt-1.5">
+                <span>Nhạt màu</span>
+                <span>Chuẩn</span>
+                <span>Rực rỡ</span>
+              </div>
+            </div>
+
+            <!-- Luminance -->
+            <div class="rounded-2xl border border-zinc-800/80 bg-[#1A1A21]/85 p-3.5">
+              <div class="flex items-center justify-between text-xs mb-2">
+                <label for="hslLumSlider" class="font-medium text-zinc-200 cursor-pointer" title="Nhấp đúp để đặt lại 0">
+                  Độ sáng (Luminance)
+                </label>
+                <span id="hslLumVal" class="font-mono text-xs font-semibold text-zinc-400">0</span>
+              </div>
+              <input id="hslLumSlider" type="range" min="-100" max="100" value="0" class="studio-slider hsl-lum-track" />
+              <div class="flex justify-between text-[10px] text-zinc-500 mt-1.5">
+                <span>Trầm tối</span>
+                <span>Chuẩn</span>
+                <span>Sáng mịn</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pro Photography Tip Box -->
+          <div class="rounded-2xl border border-purple-500/20 bg-purple-500/5 p-3 text-[11px] text-zinc-300 leading-relaxed">
+            <span class="font-semibold text-[#FF6B9D]">Mẹo chỉnh nhanh:</span> Chọn kênh <strong class="text-orange-400">Cam</strong> và tăng <strong class="text-white">Độ sáng (+15 đến +30)</strong> để làm da trắng hồng tự nhiên; chọn <strong class="text-sky-400">Xanh dương</strong> và kéo <strong class="text-white">Sắc độ (-25)</strong> để tạo bầu trời màu Teal điện ảnh.
+          </div>
+        </div>
+
+      </div>
+    </aside>
+  </main>
+
+  <!-- Save Custom Preset Modal -->
+  <div id="savePresetModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+    <div class="w-full max-w-md rounded-3xl border border-zinc-800 bg-[#121216] p-6 shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <span class="flex h-7 w-7 items-center justify-center rounded-lg hypic-gradient text-white text-xs font-bold">+</span>
+          <h3 class="text-lg font-bold text-white">Lưu Mẫu Màu Của Tôi</h3>
+        </div>
+        <button id="closeSavePresetModalBtn" type="button" class="rounded-xl p-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-white">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label for="customPresetNameInput" class="block text-xs font-medium text-zinc-300 mb-1.5">Tên mẫu màu</label>
+          <input
+            id="customPresetNameInput"
+            type="text"
+            maxlength="32"
+            placeholder="Ví dụ: Nàng thơ chiều tà, Tone da Hàn Quốc..."
+            class="w-full rounded-xl border border-zinc-700 bg-[#1A1A21] px-3.5 py-2.5 text-sm text-white placeholder-zinc-500 focus:border-[#FF6B9D] focus:outline-none"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-zinc-300 mb-1.5">Chọn nhãn phân loại</label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button type="button" data-tag="Tự chỉnh" class="preset-tag-choice active-tag rounded-xl border border-[#FF6B9D] bg-[#FF6B9D]/15 py-2 px-2 text-xs font-semibold text-white transition">
+              Tự chỉnh
+            </button>
+            <button type="button" data-tag="Chân dung" class="preset-tag-choice rounded-xl border border-zinc-800 bg-[#1A1A21] py-2 px-2 text-xs font-medium text-zinc-300 hover:border-zinc-700 transition">
+              Chân dung
+            </button>
+            <button type="button" data-tag="Phong cảnh" class="preset-tag-choice rounded-xl border border-zinc-800 bg-[#1A1A21] py-2 px-2 text-xs font-medium text-zinc-300 hover:border-zinc-700 transition">
+              Phong cảnh
+            </button>
+            <button type="button" data-tag="Phim" class="preset-tag-choice rounded-xl border border-zinc-800 bg-[#1A1A21] py-2 px-2 text-xs font-medium text-zinc-300 hover:border-zinc-700 transition">
+              Phim
+            </button>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-zinc-800/90 bg-[#1A1A21] p-3 text-[11px] text-zinc-400">
+          Công thức sẽ lưu đầy đủ <strong class="text-zinc-200">10 thông số Cơ bản</strong> và <strong class="text-zinc-200">8 kênh Trộn màu HSL</strong> trực tiếp vào bộ nhớ thiết bị này.
+        </div>
+
+        <button id="confirmSavePresetBtn" type="button" class="w-full flex items-center justify-center gap-2 rounded-2xl hypic-gradient py-3 text-sm font-bold text-white hypic-glow transition hover:brightness-110 active:scale-[0.99]">
+          <span>Lưu Mẫu Vào Máy</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export / Download Quality Modal -->
+  <div id="exportModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+    <div class="w-full max-w-md rounded-3xl border border-zinc-800 bg-[#121216] p-6 shadow-2xl">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-bold text-white">Xuất Ảnh Chất Lượng Gốc</h3>
+        <button id="closeExportModalBtn" type="button" class="rounded-xl p-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-white">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="space-y-4">
+        <div class="rounded-2xl border border-zinc-800 bg-[#1A1A21] p-3.5 text-xs space-y-1.5">
+          <div class="flex justify-between">
+            <span class="text-zinc-400">Độ phân giải xuất:</span>
+            <span id="exportResolutionText" class="font-mono font-semibold text-white">1080 × 1350 px (100% Gốc)</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-zinc-400">Mẫu màu đang dùng:</span>
+            <span id="exportPresetText" class="font-medium text-[#FF6B9D]">Gốc</span>
+          </div>
+        </div>
+
+        <!-- Format Selection -->
+        <div>
+          <label class="block text-xs font-medium text-zinc-300 mb-2">Định dạng tệp</label>
+          <div class="grid grid-cols-2 gap-2.5">
+            <button type="button" data-format="image/jpeg" class="export-format-btn active-format rounded-xl border border-[#FF6B9D] bg-[#FF6B9D]/15 p-3 text-left transition">
+              <div class="text-sm font-bold text-white">JPG (Khuyên dùng)</div>
+              <div class="text-[11px] text-zinc-400 mt-0.5">Chất lượng 95% • Tối ưu mạng xã hội</div>
+            </button>
+            <button type="button" data-format="image/png" class="export-format-btn rounded-xl border border-zinc-800 bg-[#1A1A21] p-3 text-left transition hover:border-zinc-700">
+              <div class="text-sm font-bold text-white">PNG Lossless</div>
+              <div class="text-[11px] text-zinc-400 mt-0.5">Không nén • Chi tiết tối đa</div>
+            </button>
+          </div>
+        </div>
+
+        <button id="confirmDownloadBtn" type="button" class="w-full flex items-center justify-center gap-2 rounded-2xl hypic-gradient py-3.5 text-sm font-bold text-white hypic-glow transition hover:brightness-110 active:scale-[0.99]">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          <span>Lưu Ảnh Về Máy Ngay</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container (Replaces alert/confirm) -->
+  <div id="toastContainer" class="fixed bottom-20 lg:bottom-6 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 pointer-events-none"></div>
+
+  <script>
+    /**
+     * ============================================================================
+     * HYPIC STUDIO PRO - CHỈNH MÀU ẢNH TỰ ĐỘNG, HSL COLOR MIXER & LƯU MẪU CÁ NHÂN
+     * Xử lý ảnh 100% Client-Side HTML5 Canvas (Zero CORS, 60fps LUT Engine)
+     * ============================================================================
+     */
+
+    const STORAGE_KEY_CUSTOM_PRESETS = 'hypic_studio_custom_presets_v1';
+
+    // ----------------------------------------------------------------------------
+    // 1. ĐỊNH NGHĨA 10 THANH CƠ BẢN & 8 KÊNH MÀU HSL CHUẨN LIGHTROOM
+    // ----------------------------------------------------------------------------
+    const ADJUSTMENT_DEFS = [
+      { key: 'brightness', label: 'Độ sáng', min: -100, max: 100, default: 0, icon: '☀️' },
+      { key: 'contrast', label: 'Tương phản', min: -100, max: 100, default: 0, icon: '◐' },
+      { key: 'saturation', label: 'Độ bão hòa', min: -100, max: 100, default: 0, icon: '🎨' },
+      { key: 'warmth', label: 'Nhiệt màu (Độ ấm)', min: -100, max: 100, default: 0, icon: '🌡️' },
+      { key: 'tint', label: 'Sắc độ (Xanh / Hồng)', min: -100, max: 100, default: 0, icon: '🌸' },
+      { key: 'highlights', label: 'Vùng sáng', min: -100, max: 100, default: 0, icon: '✨' },
+      { key: 'shadows', label: 'Vùng tối', min: -100, max: 100, default: 0, icon: '🌑' },
+      { key: 'fade', label: 'Phai màu phim', min: 0, max: 100, default: 0, icon: '🌫️' },
+      { key: 'grain', label: 'Hạt phim', min: 0, max: 100, default: 0, icon: '🎞️' },
+      { key: 'vignette', label: 'Tối 4 góc', min: 0, max: 100, default: 0, icon: 'vignette' },
+    ];
+
+    const HSL_CHANNELS = [
+      { key: 'red', name: 'Đỏ (Red)', short: 'Đỏ', center: 0, color: '#EF4444', hint: 'Màu môi, hoa đỏ & điểm nhấn ấm', leftHue: 'Hồng tím', rightHue: 'Cam ấm' },
+      { key: 'orange', name: 'Cam (Orange)', short: 'Cam', center: 30, color: '#F97316', hint: 'Tông da chân dung & nắng hoàng hôn', leftHue: 'Đỏ hồng', rightHue: 'Vàng nắng' },
+      { key: 'yellow', name: 'Vàng (Yellow)', short: 'Vàng', center: 60, color: '#EAB308', hint: 'Ánh nắng, lá thu & tông ấm', leftHue: 'Cam rực', rightHue: 'Xanh mạ' },
+      { key: 'green', name: 'Xanh lá (Green)', short: 'Lá', center: 120, color: '#22C55E', hint: 'Cây cối, thiên nhiên & nền lá', leftHue: 'Vàng thu', rightHue: 'Ngọc lục bảo' },
+      { key: 'aqua', name: 'Xanh ngọc (Aqua)', short: 'Ngọc', center: 180, color: '#06B6D4', hint: 'Mặt nước, bầu trời trong & Teal', leftHue: 'Xanh lá', rightHue: 'Xanh biển' },
+      { key: 'blue', name: 'Xanh dương (Blue)', short: 'Dương', center: 235, color: '#3B82F6', hint: 'Bầu trời sâu, trang phục denim', leftHue: 'Teal điện ảnh', rightHue: 'Tím chàm' },
+      { key: 'purple', name: 'Tím (Purple)', short: 'Tím', center: 278, color: '#A855F7', hint: 'Hoàng hôn tím & ánh đèn đêm', leftHue: 'Xanh chàm', rightHue: 'Hồng sen' },
+      { key: 'magenta', name: 'Hồng sen (Magenta)', short: 'Hồng', center: 325, color: '#EC4899', hint: 'Hoa anh đào, má hồng & neon', leftHue: 'Tím mộng', rightHue: 'Đỏ san hô' },
+    ];
+
+    function createEmptyHslMap() {
+      const map = {};
+      HSL_CHANNELS.forEach(ch => {
+        map[ch.key] = { h: 0, s: 0, l: 0 };
+      });
+      return map;
+    }
+
+    function cloneHslMap(src) {
+      const map = createEmptyHslMap();
+      if (!src) return map;
+      HSL_CHANNELS.forEach(ch => {
+        if (src[ch.key]) {
+          map[ch.key] = {
+            h: Number(src[ch.key].h) || 0,
+            s: Number(src[ch.key].s) || 0,
+            l: Number(src[ch.key].l) || 0,
+          };
+        }
+      });
+      return map;
+    }
+
+    // ----------------------------------------------------------------------------
+    // 2. THƯ VIỆN 20 MẪU MÀU SẴN CÓ (HYPIC & LIGHTROOM COLLECTION)
+    // ----------------------------------------------------------------------------
+    const BUILTIN_PRESETS = [
+      {
+        id: 'original',
+        name: 'Gốc',
+        tag: 'Original',
+        category: 'hypic',
+        params: { brightness: 0, contrast: 0, saturation: 0, warmth: 0, tint: 0, highlights: 0, shadows: 0, fade: 0, grain: 0, vignette: 0 },
+        hsl: {},
+        splitTone: null
+      },
+      {
+        id: 'soft_pink',
+        name: 'Nàng Thơ Hồng Phấn',
+        tag: 'Hypic',
+        category: 'hypic',
+        params: { brightness: 12, contrast: -8, saturation: 6, warmth: 6, tint: 22, highlights: -14, shadows: 20, fade: 12, grain: 6, vignette: 8 },
+        hsl: {
+          red: { h: -8, s: 12, l: 10 },
+          orange: { h: -6, s: -8, l: 22 },
+          green: { h: 12, s: -25, l: 8 },
+          blue: { h: -12, s: -14, l: 12 },
+          magenta: { h: 6, s: 18, l: 12 }
+        },
+        splitTone: { shadow: [10, 4, 14], highlight: [20, 8, 16] }
+      },
+      {
+        id: 'retro_ccd',
+        name: 'CCD Cổ Điển',
+        tag: 'Hypic',
+        category: 'hypic',
+        params: { brightness: 6, contrast: 18, saturation: 12, warmth: 10, tint: -6, highlights: 12, shadows: -10, fade: 14, grain: 24, vignette: 22 },
+        hsl: {
+          red: { h: 6, s: 16, l: -4 },
+          orange: { h: 4, s: 10, l: 8 },
+          aqua: { h: -10, s: 18, l: 6 },
+          blue: { h: -18, s: 22, l: -8 }
+        },
+        splitTone: { shadow: [-14, 12, 18], highlight: [18, 12, -8] }
+      },
+      {
+        id: 'japanese_film',
+        name: 'Phim Nhật Trong Trẻo',
+        tag: 'Film',
+        category: 'hypic',
+        params: { brightness: 18, contrast: -14, saturation: -8, warmth: -10, tint: 6, highlights: -22, shadows: 26, fade: 20, grain: 8, vignette: 0 },
+        hsl: {
+          orange: { h: -4, s: -10, l: 20 },
+          green: { h: 18, s: -22, l: 12 },
+          aqua: { h: -8, s: 16, l: 18 },
+          blue: { h: -16, s: 10, l: 16 }
+        },
+        splitTone: { shadow: [-6, 10, 14], highlight: [6, 12, 14] }
+      },
+      {
+        id: 'creamy_ktone',
+        name: 'Hàn Quốc Sữa K-Tone',
+        tag: 'K-Tone',
+        category: 'hypic',
+        params: { brightness: 16, contrast: -12, saturation: -6, warmth: 10, tint: 14, highlights: -24, shadows: 28, fade: 24, grain: 5, vignette: 6 },
+        hsl: {
+          red: { h: -6, s: -8, l: 12 },
+          orange: { h: -5, s: -14, l: 26 },
+          yellow: { h: -10, s: -24, l: 14 },
+          green: { h: 14, s: -32, l: 10 }
+        },
+        splitTone: { shadow: [10, 8, 10], highlight: [16, 12, 10] }
+      },
+      {
+        id: 'saigon_vintage',
+        name: 'Sài Gòn Vintage',
+        tag: 'Vintage',
+        category: 'hypic',
+        params: { brightness: 4, contrast: 14, saturation: -12, warmth: 32, tint: 8, highlights: -16, shadows: 12, fade: 26, grain: 30, vignette: 30 },
+        hsl: {
+          red: { h: 10, s: -10, l: -4 },
+          orange: { h: 8, s: 12, l: 6 },
+          yellow: { h: -16, s: 18, l: 4 },
+          green: { h: -24, s: -36, l: -12 },
+          blue: { h: -22, s: -28, l: -10 }
+        },
+        splitTone: { shadow: [14, 10, -10], highlight: [24, 18, -12] }
+      },
+      {
+        id: 'lr_teal_orange',
+        name: 'LR: Teal & Orange',
+        tag: 'Lightroom',
+        category: 'lightroom',
+        params: { brightness: 4, contrast: 20, saturation: 12, warmth: 14, tint: 4, highlights: -14, shadows: 10, fade: 6, grain: 10, vignette: 22 },
+        hsl: {
+          red: { h: 14, s: 16, l: 4 },
+          orange: { h: -6, s: 24, l: 16 },
+          yellow: { h: -26, s: 14, l: 6 },
+          green: { h: 36, s: -28, l: -12 },
+          aqua: { h: -12, s: 32, l: 6 },
+          blue: { h: -34, s: 28, l: -10 }
+        },
+        splitTone: { shadow: [-18, 14, 20], highlight: [24, 12, -14] }
+      },
+      {
+        id: 'lr_kodak_portra',
+        name: 'LR: Kodak Portra 400',
+        tag: 'Lightroom',
+        category: 'lightroom',
+        params: { brightness: 10, contrast: 6, saturation: -4, warmth: 14, tint: 10, highlights: -18, shadows: 22, fade: 14, grain: 16, vignette: 10 },
+        hsl: {
+          red: { h: 6, s: 8, l: 6 },
+          orange: { h: -4, s: 8, l: 18 },
+          yellow: { h: -12, s: -12, l: 10 },
+          green: { h: 16, s: -28, l: 6 },
+          blue: { h: -14, s: -16, l: 8 }
+        },
+        splitTone: { shadow: [8, 8, 6], highlight: [18, 14, 4] }
+      },
+      {
+        id: 'lr_fuji_chrome',
+        name: 'LR: Fuji Classic Chrome',
+        tag: 'Lightroom',
+        category: 'lightroom',
+        params: { brightness: 2, contrast: 18, saturation: -16, warmth: -4, tint: -4, highlights: -12, shadows: 8, fade: 16, grain: 18, vignette: 18 },
+        hsl: {
+          red: { h: 8, s: -20, l: -12 },
+          orange: { h: 4, s: -12, l: 10 },
+          yellow: { h: -10, s: -18, l: 4 },
+          green: { h: 22, s: -34, l: -14 },
+          aqua: { h: -14, s: 12, l: 4 },
+          blue: { h: -24, s: -14, l: -8 }
+        },
+        splitTone: { shadow: [-8, 10, 12], highlight: [12, 10, -4] }
+      },
+      {
+        id: 'lr_cinematic_moody',
+        name: 'LR: Cinematic Moody',
+        tag: 'Lightroom',
+        category: 'lightroom',
+        params: { brightness: -6, contrast: 24, saturation: -14, warmth: 12, tint: 4, highlights: -20, shadows: -8, fade: 18, grain: 20, vignette: 34 },
+        hsl: {
+          orange: { h: -6, s: 14, l: 12 },
+          yellow: { h: -24, s: -30, l: -8 },
+          green: { h: 28, s: -56, l: -28 },
+          aqua: { h: -18, s: -32, l: -14 },
+          blue: { h: -22, s: -38, l: -18 }
+        },
+        splitTone: { shadow: [-10, 8, 10], highlight: [18, 12, -8] }
+      },
+      {
+        id: 'lr_clean_portrait',
+        name: 'LR: Clean Portrait Glow',
+        tag: 'Lightroom',
+        category: 'lightroom',
+        params: { brightness: 14, contrast: 6, saturation: 4, warmth: 8, tint: 10, highlights: -16, shadows: 24, fade: 6, grain: 0, vignette: 6 },
+        hsl: {
+          red: { h: -4, s: 10, l: 8 },
+          orange: { h: -5, s: -12, l: 28 },
+          yellow: { h: -10, s: -16, l: 12 },
+          green: { h: 10, s: -18, l: 6 }
+        },
+        splitTone: { shadow: [4, 4, 8], highlight: [12, 8, 6] }
+      },
+      {
+        id: 'lr_golden_hour',
+        name: 'LR: Golden Hour Warm',
+        tag: 'Lightroom',
+        category: 'lightroom',
+        params: { brightness: 8, contrast: 12, saturation: 18, warmth: 38, tint: 10, highlights: -12, shadows: 14, fade: 8, grain: 8, vignette: 16 },
+        hsl: {
+          red: { h: 12, s: 14, l: 4 },
+          orange: { h: 4, s: 22, l: 14 },
+          yellow: { h: -18, s: 26, l: 12 },
+          green: { h: -32, s: -20, l: -6 },
+          blue: { h: -18, s: -22, l: 6 }
+        },
+        splitTone: { shadow: [16, 6, -12], highlight: [28, 16, -10] }
+      },
+      {
+        id: 'lr_nordic_matte',
+        name: 'LR: Nordic Cool Matte',
+        tag: 'Lightroom',
+        category: 'lightroom',
+        params: { brightness: 6, contrast: -6, saturation: -18, warmth: -22, tint: 4, highlights: -18, shadows: 18, fade: 26, grain: 14, vignette: 14 },
+        hsl: {
+          orange: { h: -4, s: -12, l: 14 },
+          yellow: { h: -12, s: -36, l: 6 },
+          green: { h: 20, s: -42, l: -10 },
+          aqua: { h: -10, s: 10, l: 8 },
+          blue: { h: -16, s: 14, l: -6 }
+        },
+        splitTone: { shadow: [-12, 6, 16], highlight: [-4, 6, 12] }
+      },
+      {
+        id: 'lr_pastel_dream',
+        name: 'LR: Pastel Dream',
+        tag: 'Lightroom',
+        category: 'lightroom',
+        params: { brightness: 16, contrast: -12, saturation: 6, warmth: -4, tint: 16, highlights: -20, shadows: 26, fade: 18, grain: 4, vignette: 0 },
+        hsl: {
+          red: { h: -10, s: 14, l: 14 },
+          orange: { h: -6, s: -10, l: 22 },
+          aqua: { h: -8, s: 24, l: 24 },
+          blue: { h: -18, s: 16, l: 20 },
+          purple: { h: 10, s: 18, l: 16 },
+          magenta: { h: 6, s: 20, l: 16 }
+        },
+        splitTone: { shadow: [6, 8, 16], highlight: [16, 10, 18] }
+      },
+      {
+        id: 'lr_dark_editorial',
+        name: 'LR: Dark & Editorial',
+        tag: 'Lightroom',
+        category: 'lightroom',
+        params: { brightness: -10, contrast: 28, saturation: -20, warmth: 6, tint: 2, highlights: -16, shadows: -14, fade: 12, grain: 18, vignette: 36 },
+        hsl: {
+          red: { h: 8, s: -14, l: -10 },
+          orange: { h: -4, s: -10, l: 10 },
+          yellow: { h: -20, s: -34, l: -12 },
+          green: { h: 24, s: -52, l: -26 },
+          blue: { h: -20, s: -36, l: -20 }
+        },
+        splitTone: { shadow: [-6, 4, 8], highlight: [14, 10, -4] }
+      },
+      {
+        id: 'lr_emerald_forest',
+        name: 'LR: Emerald Forest',
+        tag: 'Lightroom',
+        category: 'lightroom',
+        params: { brightness: 2, contrast: 16, saturation: 8, warmth: 10, tint: -8, highlights: -14, shadows: 12, fade: 10, grain: 12, vignette: 24 },
+        hsl: {
+          orange: { h: -4, s: 14, l: 14 },
+          yellow: { h: -22, s: 16, l: 4 },
+          green: { h: 28, s: 18, l: -18 },
+          aqua: { h: -16, s: 22, l: -10 }
+        },
+        splitTone: { shadow: [-12, 12, 8], highlight: [18, 14, -8] }
+      },
+      {
+        id: 'lr_sunset_coral',
+        name: 'LR: Sunset Coral',
+        tag: 'Lightroom',
+        category: 'lightroom',
+        params: { brightness: 8, contrast: 14, saturation: 20, warmth: 24, tint: 22, highlights: -12, shadows: 16, fade: 8, grain: 8, vignette: 16 },
+        hsl: {
+          red: { h: 10, s: 24, l: 8 },
+          orange: { h: -8, s: 22, l: 14 },
+          yellow: { h: -24, s: 18, l: 8 },
+          purple: { h: 14, s: 20, l: 6 },
+          magenta: { h: -8, s: 26, l: 10 }
+        },
+        splitTone: { shadow: [14, 4, 12], highlight: [26, 12, 6] }
+      },
+      {
+        id: 'lr_cyberpunk_neon',
+        name: 'LR: Cyberpunk Neon',
+        tag: 'Lightroom',
+        category: 'lightroom',
+        params: { brightness: -4, contrast: 30, saturation: 24, warmth: -18, tint: 26, highlights: 10, shadows: -14, fade: 8, grain: 14, vignette: 34 },
+        hsl: {
+          aqua: { h: -10, s: 36, l: 12 },
+          blue: { h: -22, s: 32, l: -6 },
+          purple: { h: 16, s: 34, l: 10 },
+          magenta: { h: -10, s: 38, l: 12 }
+        },
+        splitTone: { shadow: [-22, 14, 24], highlight: [26, -8, 24] }
+      },
+      {
+        id: 'lr_bw_high_contrast',
+        name: 'LR: B&W High Contrast',
+        tag: 'B&W',
+        category: 'lightroom',
+        params: { brightness: 4, contrast: 36, saturation: -100, warmth: 0, tint: 0, highlights: 14, shadows: -16, fade: 8, grain: 22, vignette: 32 },
+        hsl: {
+          red: { h: 0, s: 0, l: 18 },
+          orange: { h: 0, s: 0, l: 22 },
+          yellow: { h: 0, s: 0, l: 10 },
+          green: { h: 0, s: 0, l: -12 },
+          blue: { h: 0, s: 0, l: -28 }
+        },
+        splitTone: null
+      },
+      {
+        id: 'lr_bw_silver_film',
+        name: 'LR: B&W Silver Film',
+        tag: 'B&W',
+        category: 'lightroom',
+        params: { brightness: 8, contrast: 18, saturation: -100, warmth: 4, tint: 0, highlights: -14, shadows: 16, fade: 24, grain: 34, vignette: 26 },
+        hsl: {
+          orange: { h: 0, s: 0, l: 20 },
+          green: { h: 0, s: 0, l: -8 },
+          blue: { h: 0, s: 0, l: -18 }
+        },
+        splitTone: { shadow: [4, 4, 2], highlight: [8, 7, 4] }
+      }
+    ];
+
+    // ----------------------------------------------------------------------------
+    // 3. QUẢN LÝ MẪU MÀU TỰ LƯU TRÊN TỪNG MÁY (LOCALSTORAGE)
+    // ----------------------------------------------------------------------------
+    let customPresets = [];
+
+    function loadCustomPresetsFromStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY_CUSTOM_PRESETS);
+        if (!raw) {
+          customPresets = [];
+          return;
+        }
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          customPresets = parsed.map(item => ({
+            id: item.id || ('custom_' + Date.now() + Math.random().toString(36).slice(2, 6)),
+            name: String(item.name || 'Mẫu tự chỉnh').slice(0, 32),
+            tag: String(item.tag || 'Tự chỉnh'),
+            category: 'custom',
+            isCustom: true,
+            params: { ...item.params },
+            hsl: cloneHslMap(item.hsl),
+            splitTone: item.splitTone || null
+          }));
+        }
+      } catch (err) {
+        console.warn('Không thể đọc mẫu màu từ bộ nhớ máy:', err);
+        customPresets = [];
+      }
+    }
+
+    function saveCustomPresetsToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY_CUSTOM_PRESETS, JSON.stringify(customPresets));
+      } catch (err) {
+        showToast('Bộ nhớ trình duyệt đầy, không thể lưu thêm mẫu mới.');
+      }
+    }
+
+    function getAllPresets() {
+      return [...customPresets, ...BUILTIN_PRESETS];
+    }
+
+    // ----------------------------------------------------------------------------
+    // 4. TRẠNG THÁI ỨNG DỤNG (STATE)
+    // ----------------------------------------------------------------------------
+    const state = {
+      activeTab: 'presets', // 'presets' | 'basic' | 'hsl'
+      activePresetCategory: 'all', // 'all' | 'custom' | 'lightroom' | 'hypic'
+      activePresetId: 'original',
+      presetIntensity: 100,
+
+      // Thông số cơ bản (10 thanh)
+      userOffsets: {},
+      currentParams: {},
+
+      // Thông số HSL (8 kênh màu)
+      selectedHslChannel: 'orange',
+      userHslOffsets: createEmptyHslMap(),
+      currentHsl: createEmptyHslMap(),
+
+      splitTone: null,
+      splitActive: true,
+      splitPercent: 50,
+      isHoldingOriginal: false,
+      exportFormat: 'image/jpeg',
+      selectedSaveTag: 'Tự chỉnh',
+      activeSampleKey: 'sunset_muse',
+      sourceWidth: 1080,
+      sourceHeight: 1350,
+    };
+
+    ADJUSTMENT_DEFS.forEach(def => {
+      state.userOffsets[def.key] = 0;
+      state.currentParams[def.key] = 0;
+    });
+
+    // Các Canvas Offscreen & Hiển thị
+    const fullSourceCanvas = document.createElement('canvas');
+    const fullSourceCtx = fullSourceCanvas.getContext('2d', { willReadFrequently: true });
+
+    const previewSourceCanvas = document.createElement('canvas');
+    const previewSourceCtx = previewSourceCanvas.getContext('2d', { willReadFrequently: true });
+
+    const thumbSourceCanvas = document.createElement('canvas');
+    const thumbSourceCtx = thumbSourceCanvas.getContext('2d', { willReadFrequently: true });
+
+    const originalCanvas = document.getElementById('originalCanvas');
+    const originalCtx = originalCanvas.getContext('2d');
+
+    const editedCanvas = document.getElementById('editedCanvas');
+    const editedCtx = editedCanvas.getContext('2d', { willReadFrequently: true });
+
+    // ----------------------------------------------------------------------------
+    // 5. BỘ TẠO 3 ẢNH MẪU NGHỆ THUẬT ĐỘ PHÂN GIẢI CAO (100% CANVAS - ZERO CORS)
+    // ----------------------------------------------------------------------------
+    const SampleArtworkGenerator = {
+      renderSample(key, targetCanvas) {
+        const w = 1080;
+        const h = 1350;
+        targetCanvas.width = w;
+        targetCanvas.height = h;
+        const ctx = targetCanvas.getContext('2d');
+
+        if (key === 'sunset_muse') {
+          this.drawSunsetMuse(ctx, w, h);
+        } else if (key === 'twilight_cafe') {
+          this.drawTwilightCafe(ctx, w, h);
+        } else {
+          this.drawPastelBlossoms(ctx, w, h);
+        }
+      },
+
+      drawSunsetMuse(ctx, w, h) {
+        const sky = ctx.createLinearGradient(0, 0, 0, h);
+        sky.addColorStop(0.0, '#1E1B4B');
+        sky.addColorStop(0.28, '#581C87');
+        sky.addColorStop(0.52, '#BE185D');
+        sky.addColorStop(0.74, '#F97316');
+        sky.addColorStop(0.92, '#FDE047');
+        sky.addColorStop(1.0, '#FEF9C3');
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, w, h);
+
+        const sunX = w * 0.68;
+        const sunY = h * 0.56;
+        const sunGlow = ctx.createRadialGradient(sunX, sunY, 20, sunX, sunY, 520);
+        sunGlow.addColorStop(0, 'rgba(255, 251, 235, 0.95)');
+        sunGlow.addColorStop(0.22, 'rgba(253, 224, 71, 0.65)');
+        sunGlow.addColorStop(0.55, 'rgba(251, 113, 133, 0.25)');
+        sunGlow.addColorStop(1, 'rgba(251, 113, 133, 0)');
+        ctx.fillStyle = sunGlow;
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.fillStyle = 'rgba(49, 16, 66, 0.55)';
+        ctx.beginPath();
+        ctx.moveTo(0, h * 0.72);
+        ctx.quadraticCurveTo(w * 0.28, h * 0.61, w * 0.56, h * 0.70);
+        ctx.quadraticCurveTo(w * 0.82, h * 0.76, w, h * 0.67);
+        ctx.lineTo(w, h);
+        ctx.lineTo(0, h);
+        ctx.closePath();
+        ctx.fill();
+
+        const bokehs = [
+          [0.18, 0.24, 46, 'rgba(255, 182, 193, 0.22)'],
+          [0.82, 0.22, 62, 'rgba(253, 224, 71, 0.20)'],
+          [0.78, 0.42, 34, 'rgba(255, 255, 255, 0.28)'],
+          [0.14, 0.52, 54, 'rgba(251, 146, 60, 0.22)'],
+          [0.88, 0.64, 42, 'rgba(254, 240, 138, 0.30)'],
+        ];
+        bokehs.forEach(([bx, by, br, col]) => {
+          ctx.beginPath();
+          ctx.arc(w * bx, h * by, br, 0, Math.PI * 2);
+          ctx.fillStyle = col;
+          ctx.fill();
+        });
+
+        ctx.save();
+        const hairGrad = ctx.createLinearGradient(w * 0.2, h * 0.25, w * 0.65, h * 0.85);
+        hairGrad.addColorStop(0, '#271724');
+        hairGrad.addColorStop(0.6, '#3B1E2E');
+        hairGrad.addColorStop(1, '#1C111B');
+        ctx.fillStyle = hairGrad;
+        ctx.beginPath();
+        ctx.moveTo(w * 0.22, h);
+        ctx.bezierCurveTo(w * 0.14, h * 0.65, w * 0.20, h * 0.30, w * 0.44, h * 0.27);
+        ctx.bezierCurveTo(w * 0.62, h * 0.26, w * 0.66, h * 0.44, w * 0.62, h * 0.62);
+        ctx.bezierCurveTo(w * 0.58, h * 0.78, w * 0.64, h * 0.90, w * 0.66, h);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(253, 224, 71, 0.65)';
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(w * 0.44, h * 0.27);
+        ctx.bezierCurveTo(w * 0.62, h * 0.26, w * 0.66, h * 0.44, w * 0.62, h * 0.62);
+        ctx.stroke();
+
+        const skinGrad = ctx.createLinearGradient(w * 0.34, h * 0.42, w * 0.64, h * 0.85);
+        skinGrad.addColorStop(0, '#FAD2BE');
+        skinGrad.addColorStop(0.5, '#EEB399');
+        skinGrad.addColorStop(1, '#D58F76');
+        ctx.fillStyle = skinGrad;
+        ctx.beginPath();
+        ctx.moveTo(w * 0.34, h * 0.96);
+        ctx.quadraticCurveTo(w * 0.38, h * 0.74, w * 0.43, h * 0.64);
+        ctx.lineTo(w * 0.54, h * 0.65);
+        ctx.quadraticCurveTo(w * 0.56, h * 0.76, w * 0.68, h * 0.96);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = skinGrad;
+        ctx.beginPath();
+        ctx.moveTo(w * 0.44, h * 0.34);
+        ctx.quadraticCurveTo(w * 0.59, h * 0.33, w * 0.61, h * 0.46);
+        ctx.lineTo(w * 0.635, h * 0.51);
+        ctx.lineTo(w * 0.605, h * 0.535);
+        ctx.quadraticCurveTo(w * 0.615, h * 0.565, w * 0.595, h * 0.585);
+        ctx.quadraticCurveTo(w * 0.585, h * 0.645, w * 0.51, h * 0.655);
+        ctx.quadraticCurveTo(w * 0.41, h * 0.63, w * 0.40, h * 0.48);
+        ctx.closePath();
+        ctx.fill();
+
+        const blush = ctx.createRadialGradient(w * 0.54, h * 0.52, 4, w * 0.54, h * 0.52, 48);
+        blush.addColorStop(0, 'rgba(244, 114, 148, 0.34)');
+        blush.addColorStop(1, 'rgba(244, 114, 148, 0)');
+        ctx.fillStyle = blush;
+        ctx.beginPath();
+        ctx.arc(w * 0.54, h * 0.52, 48, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#2B1624';
+        ctx.lineWidth = 10;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(w * 0.48, h * 0.33);
+        ctx.quadraticCurveTo(w * 0.43, h * 0.50, w * 0.47, h * 0.68);
+        ctx.stroke();
+
+        const dressGrad = ctx.createLinearGradient(w * 0.25, h * 0.78, w * 0.75, h);
+        dressGrad.addColorStop(0, '#FFF1F2');
+        dressGrad.addColorStop(1, '#FBCFE8');
+        ctx.fillStyle = dressGrad;
+        ctx.beginPath();
+        ctx.moveTo(w * 0.24, h);
+        ctx.quadraticCurveTo(w * 0.34, h * 0.79, w * 0.50, h * 0.81);
+        ctx.quadraticCurveTo(w * 0.66, h * 0.80, w * 0.76, h);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+
+        this.drawFlowerCluster(ctx, w * 0.86, h * 0.88, 38, '#F9A8D4', '#FFF1F2');
+        this.drawFlowerCluster(ctx, w * 0.14, h * 0.85, 32, '#FBCFE8', '#FEF08A');
+      },
+
+      drawTwilightCafe(ctx, w, h) {
+        const sky = ctx.createLinearGradient(0, 0, 0, h * 0.75);
+        sky.addColorStop(0, '#0F172A');
+        sky.addColorStop(0.45, '#1E293B');
+        sky.addColorStop(0.8, '#4C3558');
+        sky.addColorStop(1, '#9A5B65');
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, w, h);
+
+        const streetGrad = ctx.createLinearGradient(0, h * 0.74, 0, h);
+        streetGrad.addColorStop(0, '#18181B');
+        streetGrad.addColorStop(1, '#09090B');
+        ctx.fillStyle = streetGrad;
+        ctx.fillRect(0, h * 0.74, w, h * 0.26);
+
+        ctx.fillStyle = '#27232E';
+        ctx.fillRect(w * 0.12, h * 0.18, w * 0.76, h * 0.58);
+
+        for (let i = 0; i < 3; i++) {
+          const wx = w * (0.20 + i * 0.22);
+          const wy = h * 0.25;
+          const winGlow = ctx.createLinearGradient(wx, wy, wx, wy + 170);
+          winGlow.addColorStop(0, '#FDE68A');
+          winGlow.addColorStop(1, '#D97706');
+          ctx.fillStyle = winGlow;
+          ctx.fillRect(wx, wy, w * 0.16, 170);
+          ctx.strokeStyle = '#18181B';
+          ctx.lineWidth = 5;
+          ctx.strokeRect(wx, wy, w * 0.16, 170);
+        }
+
+        const stripes = 10;
+        const awningX = w * 0.10;
+        const awningY = h * 0.44;
+        const awningW = w * 0.80;
+        const stripeW = awningW / stripes;
+        for (let s = 0; s < stripes; s++) {
+          ctx.fillStyle = s % 2 === 0 ? '#9F1239' : '#FEF3C7';
+          ctx.beginPath();
+          ctx.moveTo(awningX + s * stripeW, awningY);
+          ctx.lineTo(awningX + (s + 1) * stripeW, awningY);
+          ctx.lineTo(awningX + (s + 1) * stripeW - 8, awningY + 75);
+          ctx.lineTo(awningX + s * stripeW - 8, awningY + 75);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        const cafeWin = ctx.createRadialGradient(w * 0.5, h * 0.62, 30, w * 0.5, h * 0.62, 340);
+        cafeWin.addColorStop(0, '#FEF9C3');
+        cafeWin.addColorStop(0.45, '#FBBF24');
+        cafeWin.addColorStop(1, '#B45309');
+        ctx.fillStyle = cafeWin;
+        ctx.fillRect(w * 0.18, h * 0.52, w * 0.64, h * 0.23);
+
+        ctx.strokeStyle = '#291D18';
+        ctx.lineWidth = 10;
+        ctx.strokeRect(w * 0.18, h * 0.52, w * 0.64, h * 0.23);
+        ctx.beginPath();
+        ctx.moveTo(w * 0.40, h * 0.52);
+        ctx.lineTo(w * 0.40, h * 0.75);
+        ctx.moveTo(w * 0.62, h * 0.52);
+        ctx.lineTo(w * 0.62, h * 0.75);
+        ctx.stroke();
+
+        ctx.save();
+        ctx.shadowColor = '#FF6B9D';
+        ctx.shadowBlur = 24;
+        ctx.strokeStyle = '#FF6B9D';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(w * 0.36, h * 0.39, w * 0.28, 46);
+        ctx.fillStyle = '#FFE4E6';
+        ctx.font = 'bold 26px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('HYPIC CAFE', w * 0.5, h * 0.422);
+        ctx.restore();
+
+        for (let b = 0; b < 9; b++) {
+          const bx = w * (0.14 + b * 0.09);
+          const by = h * 0.50 + Math.sin(b * 0.😎 * 10;
+          const bulbGlow = ctx.createRadialGradient(bx, by, 2, bx, by, 26);
+          bulbGlow.addColorStop(0, '#FFFBEB');
+          bulbGlow.addColorStop(0.4, 'rgba(251, 191, 36, 0.6)');
+          bulbGlow.addColorStop(1, 'rgba(251, 191, 36, 0)');
+          ctx.fillStyle = bulbGlow;
+          ctx.beginPath();
+          ctx.arc(bx, by, 26, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.fillStyle = '#065F46';
+        ctx.beginPath();
+        ctx.arc(w * 0.16, h * 0.70, 48, 0, Math.PI * 2);
+        ctx.arc(w * 0.84, h * 0.70, 52, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#10B981';
+        ctx.beginPath();
+        ctx.arc(w * 0.15, h * 0.68, 30, 0, Math.PI * 2);
+        ctx.arc(w * 0.85, h * 0.68, 34, 0, Math.PI * 2);
+        ctx.fill();
+
+        const reflection = ctx.createLinearGradient(0, h * 0.76, 0, h);
+        reflection.addColorStop(0, 'rgba(251, 191, 36, 0.32)');
+        reflection.addColorStop(0.5, 'rgba(255, 107, 157, 0.16)');
+        reflection.addColorStop(1, 'rgba(15, 23, 42, 0)');
+        ctx.fillStyle = reflection;
+        ctx.fillRect(w * 0.2, h * 0.76, w * 0.6, h * 0.24);
+      },
+
+      drawPastelBlossoms(ctx, w, h) {
+        const sky = ctx.createLinearGradient(0, 0, 0, h);
+        sky.addColorStop(0, '#3B82F6');
+        sky.addColorStop(0.38, '#93C5FD');
+        sky.addColorStop(0.72, '#E0E7FF');
+        sky.addColorStop(1, '#FCE7F3');
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, w, h);
+
+        const drawCloud = (cx, cy, scale) => {
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.scale(scale, scale);
+          const cloudGrad = ctx.createLinearGradient(0, -60, 0, 60);
+          cloudGrad.addColorStop(0, 'rgba(255, 255, 255, 0.96)');
+          cloudGrad.addColorStop(1, 'rgba(224, 231, 255, 0.82)');
+          ctx.fillStyle = cloudGrad;
+          ctx.beginPath();
+          ctx.arc(0, 0, 75, 0, Math.PI * 2);
+          ctx.arc(65, -15, 65, 0, Math.PI * 2);
+          ctx.arc(130, 5, 55, 0, Math.PI * 2);
+          ctx.arc(-65, 12, 55, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        };
+        drawCloud(w * 0.26, h * 0.44, 1.35);
+        drawCloud(w * 0.74, h * 0.56, 1.15);
+
+        ctx.strokeStyle = '#5C3A4D';
+        ctx.lineWidth = 14;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(-20, h * 0.14);
+        ctx.quadraticCurveTo(w * 0.32, h * 0.20, w * 0.62, h * 0.34);
+        ctx.moveTo(w * 0.25, h * 0.18);
+        ctx.quadraticCurveTo(w * 0.42, h * 0.10, w * 0.56, h * 0.08);
+        ctx.moveTo(w + 20, h * 0.68);
+        ctx.quadraticCurveTo(w * 0.68, h * 0.72, w * 0.38, h * 0.84);
+        ctx.stroke();
+
+        const blossoms = [
+          [0.14, 0.15, 36], [0.24, 0.19, 42], [0.35, 0.14, 34], [0.46, 0.10, 30],
+          [0.42, 0.25, 44], [0.54, 0.31, 38], [0.62, 0.34, 28], [0.18, 0.26, 32],
+          [0.84, 0.70, 44], [0.72, 0.74, 40], [0.58, 0.78, 36], [0.44, 0.83, 32],
+          [0.66, 0.85, 38], [0.88, 0.82, 34]
+        ];
+        blossoms.forEach(([bx, by, br], idx) => {
+          const outerCol = idx % 2 === 0 ? '#FBCFE8' : '#F9A8D4';
+          const innerCol = '#FFF1F2';
+          this.drawFlowerCluster(ctx, w * bx, h * by, br, outerCol, innerCol);
+        });
+
+        for (let p = 0; p < 18; p++) {
+          const px = w * ((p * 0.17 + 0.08) % 0.92);
+          const py = h * ((p * 0.13 + 0.12) % 0.88);
+          ctx.save();
+          ctx.translate(px, py);
+          ctx.rotate(p * 0.7);
+          ctx.fillStyle = 'rgba(255, 228, 230, 0.85)';
+          ctx.beginPath();
+          ctx.ellipse(0, 0, 11, 6, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      },
+
+      drawFlowerCluster(ctx, cx, cy, radius, petalColor, centerColor) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        for (let i = 0; i < 5; i++) {
+          ctx.save();
+          ctx.rotate((i * Math.PI * 2) / 5);
+          ctx.fillStyle = petalColor;
+          ctx.beginPath();
+          ctx.ellipse(0, -radius * 0.55, radius * 0.38, radius * 0.55, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+        ctx.fillStyle = centerColor;
+        ctx.beginPath();
+        ctx.arc(0, 0, radius * 0.24, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    };
+
+    // ----------------------------------------------------------------------------
+    // 6. ĐỘNG CƠ XỬ LÝ PIXEL TỐC ĐỘ CAO: BASIC + 360° HSL LUT COLOR MIXER
+    // ----------------------------------------------------------------------------
+    function buildHslLookupTables(hslMap) {
+      if (!hslMap) return null;
+
+      let hasActive = false;
+      for (let i = 0; i < HSL_CHANNELS.length; i++) {
+        const ch = HSL_CHANNELS[i];
+        const cfg = hslMap[ch.key];
+        if (cfg && (cfg.h !== 0 || cfg.s !== 0 || cfg.l !== 0)) {
+          hasActive = true;
+          break;
+        }
+      }
+      if (!hasActive) return null;
+
+      // Bảng tra cứu 720 mức (mỗi 0.5 độ trên vòng tròn 360°) giúp chạy 60fps
+      const BINS = 720;
+      const hueLUT = new Float32Array(BINS);
+      const satLUT = new Float32Array(BINS);
+      const lumLUT = new Float32Array(BINS);
+
+      const n = HSL_CHANNELS.length;
+      for (let b = 0; b < BINS; b++) {
+        const deg = (b * 360) / BINS;
+
+        // Tìm 2 kênh màu liền kề bao quanh góc deg để nội suy mượt mà
+        let leftIdx = n - 1;
+        let rightIdx = 0;
+        let leftDeg = HSL_CHANNELS[n - 1].center;
+        let rightDeg = 360;
+
+        for (let i = 0; i < n - 1; i++) {
+          if (deg >= HSL_CHANNELS[i].center && deg < HSL_CHANNELS[i + 1].center) {
+            leftIdx = i;
+            rightIdx = i + 1;
+            leftDeg = HSL_CHANNELS[i].center;
+            rightDeg = HSL_CHANNELS[i + 1].center;
+            break;
+          }
+        }
+
+        const span = rightDeg - leftDeg;
+        const t = span > 0 ? (deg - leftDeg) / span : 0;
+        // Smoothstep Hermite cho chuyển tiếp dải màu tự nhiên như Lightroom
+        const wRight = t * t * (3 - 2 * t);
+        const wLeft = 1 - wRight;
+
+        const cLeft = hslMap[HSL_CHANNELS[leftIdx].key] || { h: 0, s: 0, l: 0 };
+        const cRight = hslMap[HSL_CHANNELS[rightIdx].key] || { h: 0, s: 0, l: 0 };
+
+        // Hue shift tối đa ±32 độ, Saturation ±100%, Luminance ±0.35
+        hueLUT[b] = ((cLeft.h * wLeft + cRight.h * wRight) / 100) * 32;
+        satLUT[b] = (cLeft.s * wLeft + cRight.s * wRight) / 100;
+        lumLUT[b] = ((cLeft.l * wLeft + cRight.l * wRight) / 100) * 0.34;
+      }
+
+      return { hueLUT, satLUT, lumLUT };
+    }
+
+    function hueToRgbChannel(p, q, t) {
+      if (t < 0) t += 1;
+      if (t > 1) t -= 1;
+      if (t < 1 / 6) return p + (q - p) * 6 * t;
+      if (t < 1 / 2) return q;
+      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+      return p;
+    }
+
+    function processPixelBuffer(imageData, params, splitTone, intensityRatio = 1, hslMap = null) {
+      const data = imageData.data;
+      const width = imageData.width;
+      const height = imageData.height;
+
+      const brightness = params.brightness || 0;
+      const contrast = params.contrast || 0;
+      const saturation = params.saturation || 0;
+      const warmth = params.warmth || 0;
+      const tint = params.tint || 0;
+      const highlights = params.highlights || 0;
+      const shadows = params.shadows || 0;
+      const fade = params.fade || 0;
+      const grain = params.grain || 0;
+      const vignette = params.vignette || 0;
+
+      // Tiền tính toán hằng số Basic Adjustments
+      const brightOffset = (brightness / 100) * 56;
+      const cVal = contrast * 1.15;
+      const contrastFactor = (259 * (cVal + 255)) / (255 * (259 - cVal));
+
+      const warmR = warmth * 0.42;
+      const warmG = warmth * 0.06;
+      const warmB = -warmth * 0.45;
+
+      const tintR = tint * 0.24;
+      const tintG = -tint * 0.34;
+      const tintB = tint * 0.26;
+
+      const satMult = 1 + saturation / 100;
+      const shadowStrength = (shadows / 100) * 68;
+      const highlightStrength = (highlights / 100) * 68;
+
+      const blackFloor = (fade / 100) * 46;
+      const fadeScale = (255 - blackFloor) / 255;
+
+      const grainAmount = (grain / 100) * 44;
+      const vigStrength = (vignette / 100) * 0.65;
+
+      // Split-toning
+      const hasSplit = splitTone && intensityRatio > 0;
+      const shR = hasSplit ? splitTone.shadow[0] * intensityRatio : 0;
+      const shG = hasSplit ? splitTone.shadow[1] * intensityRatio : 0;
+      const shB = hasSplit ? splitTone.shadow[2] * intensityRatio : 0;
+      const hiR = hasSplit ? splitTone.highlight[0] * intensityRatio : 0;
+      const hiG = hasSplit ? splitTone.highlight[1] * intensityRatio : 0;
+      const hiB = hasSplit ? splitTone.highlight[2] * intensityRatio : 0;
+
+      // Tiền tính toán HSL LUT (chỉ kích hoạt khi có kênh màu != 0)
+      const hslLUT = buildHslLookupTables(hslMap);
+
+      // Tiền tính toán tọa độ Vignette
+      const nxSqArr = new Float32Array(width);
+      for (let x = 0; x < width; x++) {
+        const nx = (x / width - 0.5) * 2;
+        nxSqArr[x] = nx * nx;
+      }
+
+      let idx = 0;
+      for (let y = 0; y < height; y++) {
+        const ny = (y / height - 0.5) * 2;
+        const nySq = ny * ny;
+
+        for (let x = 0; x < width; x++) {
+          let r = data[idx];
+          let g = data[idx + 1];
+          let b = data[idx + 2];
+
+          // 1. Độ sáng, Nhiệt màu & Sắc độ
+          r = r + brightOffset + warmR + tintR;
+          g = g + brightOffset + warmG + tintG;
+          b = b + brightOffset + warmB + tintB;
+
+          // 2. Tương phản (Contrast)
+          r = contrastFactor * (r - 128) + 128;
+          g = contrastFactor * (g - 128) + 128;
+          b = contrastFactor * (b - 128) + 128;
+
+          // 3. Vùng sáng & Vùng tối + Split Toning
+          const lumRaw = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+          const lum = lumRaw < 0 ? 0 : lumRaw > 1 ? 1 : lumRaw;
+          const invLum = 1 - lum;
+          const shWeight = invLum * invLum;
+          const hiWeight = lum * lum;
+
+          const toneDelta = shadowStrength * shWeight + highlightStrength * hiWeight;
+          r += toneDelta;
+          g += toneDelta;
+          b += toneDelta;
+
+          if (hasSplit) {
+            r += shR * shWeight + hiR * hiWeight;
+            g += shG * shWeight + hiG * hiWeight;
+            b += shB * shWeight + hiB * hiWeight;
+          }
+
+          // 4. Trộn màu HSL từng dải màu (Lightroom Color Mixer)
+          if (hslLUT !== null) {
+            const rn = r < 0 ? 0 : r > 255 ? 1 : r / 255;
+            const gn = g < 0 ? 0 : g > 255 ? 1 : g / 255;
+            const bn = b < 0 ? 0 : b > 255 ? 1 : b / 255;
+
+            const maxC = rn > gn ? (rn > bn ? rn : bn) : (gn > bn ? gn : bn);
+            const minC = rn < gn ? (rn < bn ? rn : bn) : (gn < bn ? gn : bn);
+            const diff = maxC - minC;
+
+            // Chỉ xử lý điểm ảnh có màu sắc, bảo vệ vùng xám/trắng/đen khỏi nhiễu
+            if (diff > 0.004) {
+              const l = (maxC + minC) * 0.5;
+              const s = l > 0.5 ? diff / (2 - maxC - minC) : diff / (maxC + minC);
+
+              // Khẩu độ bảo vệ vùng xám nhạt (smooth roll-off dưới s = 0.18)
+              const satMask = s < 0.18 ? (s / 0.18) * (s / 0.18) : 1.0;
+
+              let hNorm;
+              if (maxC === rn) {
+                hNorm = ((gn - bn) / diff + (gn < bn ? 6 : 0)) / 6;
+              } else if (maxC === gn) {
+                hNorm = ((bn - rn) / diff + 2) / 6;
+              } else {
+                hNorm = ((rn - gn) / diff + 4) / 6;
+              }
+
+              let bin = (hNorm * 720) | 0;
+              if (bin < 0) bin = 0;
+              else if (bin >= 720) bin = 719;
+
+              const dHue = hslLUT.hueLUT[bin] * satMask;
+              const dSat = hslLUT.satLUT[bin] * satMask;
+              // Bảo vệ vùng sáng gắt & tối sâu khi kéo Luminance
+              const lumProtect = 1 - Math.abs(2 * l - 1) * 0.65;
+              const dLum = hslLUT.lumLUT[bin] * satMask * lumProtect;
+
+              let hNew = hNorm + dHue / 360;
+              if (hNew < 0) hNew += 1;
+              else if (hNew >= 1) hNew -= 1;
+
+              let sNew = s * (1 + dSat);
+              if (sNew < 0) sNew = 0;
+              else if (sNew > 1) sNew = 1;
+
+              let lNew = l + dLum;
+              if (lNew < 0) lNew = 0;
+              else if (lNew > 1) lNew = 1;
+
+              if (sNew <= 0.0001) {
+                r = g = b = lNew * 255;
+              } else {
+                const q = lNew < 0.5 ? lNew * (1 + sNew) : lNew + sNew - lNew * sNew;
+                const p = 2 * lNew - q;
+                r = hueToRgbChannel(p, q, hNew + 1 / 3) * 255;
+                g = hueToRgbChannel(p, q, hNew) * 255;
+                b = hueToRgbChannel(p, q, hNew - 1 / 3) * 255;
+              }
+            }
+          }
+
+          // 5. Độ bão hòa tổng thể (Saturation - đặt sau HSL để B&W mix hoạt động chuẩn)
+          if (saturation !== 0) {
+            const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+            r = gray + (r - gray) * satMult;
+            g = gray + (g - gray) * satMult;
+            b = gray + (b - gray) * satMult;
+          }
+
+          // 6. Phai màu phim (Fade)
+          if (fade > 0) {
+            r = blackFloor + r * fadeScale;
+            g = blackFloor + g * fadeScale;
+            b = blackFloor + b * fadeScale;
+          }
+
+          // 7. Hạt phim (Film Grain)
+          if (grain > 0) {
+            let hash = (x * 374761393 + y * 668265263) ^ (x * 1274126177);
+            hash = ((hash ^ (hash >> 13)) * 1274126177) ^ (hash >> 16);
+            const rand = ((hash & 0xffff) / 65535) - 0.5;
+            const noise = rand * grainAmount;
+            r += noise;
+            g += noise;
+            b += noise;
+          }
+
+          // 8. Tối 4 góc (Vignette)
+          if (vignette > 0) {
+            const distSq = nxSqArr[x] + nySq;
+            if (distSq > 0.28) {
+              const vigFactor = 1 - vigStrength * ((distSq - 0.28) / 1.72);
+              const safeVig = vigFactor < 0.15 ? 0.15 : vigFactor;
+              r *= safeVig;
+              g *= safeVig;
+              b *= safeVig;
+            }
+          }
+
+          data[idx] = r;
+          data[idx + 1] = g;
+          data[idx + 2] = b;
+          idx += 4;
+        }
+      }
+      return imageData;
+    }
+
+    // ----------------------------------------------------------------------------
+    // 7. THUẬT TOÁN TỰ ĐỘNG CHỈNH MÀU AI (HISTOGRAM + TÔN DA HỒNG TỰ NHIÊN)
+    // ----------------------------------------------------------------------------
+    function runAutoColorAI() {
+      const w = previewSourceCanvas.width;
+      const h = previewSourceCanvas.height;
+      const imgData = previewSourceCtx.getImageData(0, 0, w, h);
+      const data = imgData.data;
+
+      const hist = new Uint32Array(256);
+      let sumR = 0, sumG = 0, sumB = 0, sumSat = 0;
+      const totalPixels = w * h;
+
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const lum = Math.min(255, Math.max(0, Math.round(0.299 * r + 0.587 * g + 0.114 * b)));
+        hist[lum]++;
+
+        sumR += r;
+        sumG += g;
+        sumB += b;
+
+        const maxC = Math.max(r, g, b);
+        const minC = Math.min(r, g, b);
+        const sat = maxC === 0 ? 0 : (maxC - minC) / maxC;
+        sumSat += sat;
+      }
+
+      let cum = 0;
+      let p2 = 0, p98 = 255, p50 = 128;
+      let found2 = false, found50 = false;
+      for (let l = 0; l < 256; l++) {
+        cum += hist[l];
+        if (!found2 && cum >= totalPixels * 0.02) {
+          p2 = l;
+          found2 = true;
+        }
+        if (!found50 && cum >= totalPixels * 0.50) {
+          p50 = l;
+          found50 = true;
+        }
+        if (cum >= totalPixels * 0.98) {
+          p98 = l;
+          break;
+        }
+      }
+
+      const targetMid = 134;
+      const rawBrightness = Math.round(((targetMid - p50) / 128) * 42);
+      const autoBrightness = Math.max(-25, Math.min(34, rawBrightness));
+
+      const dynamicRange = Math.max(40, p98 - p2);
+      const rawContrast = Math.round(((225 - dynamicRange) / 225) * 38);
+      const autoContrast = Math.max(-10, Math.min(28, rawContrast));
+
+      const avgR = sumR / totalPixels;
+      const avgG = sumG / totalPixels;
+      const avgB = sumB / totalPixels;
+      const avgGray = (avgR + avgG + avgB) / 3;
+
+      const blueCast = (avgB - avgR) / Math.max(1, avgGray);
+      const autoWarmth = Math.max(-22, Math.min(28, Math.round(blueCast * 55 + 6)));
+
+      const greenCast = (avgG - (avgR + avgB) * 0.5) / Math.max(1, avgGray);
+      const autoTint = Math.max(-12, Math.min(26, Math.round(greenCast * 60 + 10)));
+
+      const avgSat = sumSat / totalPixels;
+      const autoSaturation = avgSat < 0.35 ? Math.min(24, Math.round((0.42 - avgSat) * 65)) : 8;
+      const autoHighlights = p98 > 235 ? -18 : -8;
+      const autoShadows = p2 < 24 ? 22 : 12;
+
+      state.activePresetId = 'auto_ai';
+      state.presetIntensity = 100;
+      state.splitTone = { shadow: [6, 4, 10], highlight: [14, 8, 12] };
+
+      const aiResult = {
+        brightness: autoBrightness,
+        contrast: autoContrast,
+        saturation: autoSaturation,
+        warmth: autoWarmth,
+        tint: autoTint,
+        highlights: autoHighlights,
+        shadows: autoShadows,
+        fade: 6,
+        grain: 0,
+        vignette: 8
+      };
+
+      ADJUSTMENT_DEFS.forEach(def => {
+        state.userOffsets[def.key] = aiResult[def.key] || 0;
+        state.currentParams[def.key] = aiResult[def.key] || 0;
+      });
+
+      // Kết hợp tinh chỉnh HSL nhẹ làm sáng da & trong bầu trời
+      state.userHslOffsets = createEmptyHslMap();
+      state.userHslOffsets.orange = { h: -3, s: -6, l: 16 };
+      state.userHslOffsets.blue = { h: -8, s: 10, l: 6 };
+      state.currentHsl = cloneHslMap(state.userHslOffsets);
+
+      document.getElementById('presetIntensitySlider').value = 100;
+      document.getElementById('presetIntensityVal').textContent = '100%';
+      document.getElementById('activePresetBadge').textContent = '✨ AI Tự Động';
+      document.getElementById('exportPresetText').textContent = '✨ AI Tự Động';
+
+      syncSlidersUI();
+      syncHslUI();
+      updateModifiedBadges();
+      highlightActivePresetCard();
+      renderPreview();
+
+      showToast(✨ AI đã cân bằng sáng (${autoBrightness >= 0 ? '+' : ''}${autoBrightness}), tôn da & tối ưu dải màu!);
+    }
+
+    // ----------------------------------------------------------------------------
+    // 8. QUẢN LÝ NGUỒN ẢNH, RESIZE KHUNG HÌNH & THUMBNAIL PRESETS
+    // ----------------------------------------------------------------------------
+    function loadSourceFromCanvas(sourceCanvas) {
+      const w = sourceCanvas.width;
+      const h = sourceCanvas.height;
+      state.sourceWidth = w;
+      state.sourceHeight = h;
+
+      fullSourceCanvas.width = w;
+      fullSourceCanvas.height = h;
+      fullSourceCtx.drawImage(sourceCanvas, 0, 0);
+
+      const maxPreviewDim = 960;
+      const scale = Math.min(1, maxPreviewDim / Math.max(w, h));
+      const pw = Math.max(1, Math.round(w * scale));
+      const ph = Math.max(1, Math.round(h * scale));
+      previewSourceCanvas.width = pw;
+      previewSourceCanvas.height = ph;
+      previewSourceCtx.drawImage(sourceCanvas, 0, 0, pw, ph);
+
+      originalCanvas.width = pw;
+      originalCanvas.height = ph;
+      originalCtx.drawImage(previewSourceCanvas, 0, 0);
+
+      editedCanvas.width = pw;
+      editedCanvas.height = ph;
+
+      const thumbSize = 96;
+      thumbSourceCanvas.width = thumbSize;
+      thumbSourceCanvas.height = thumbSize;
+      const minSide = Math.min(w, h);
+      const sx = (w - minSide) / 2;
+      const sy = (h - minSide) / 2;
+      thumbSourceCtx.drawImage(sourceCanvas, sx, sy, minSide, minSide, 0, 0, thumbSize, thumbSize);
+
+      document.getElementById('imageDimensionsBadge').textContent = ${w} × ${h} px;
+      document.getElementById('exportResolutionText').textContent = ${w} × ${h} px (100% Gốc);
+
+      fitStageToViewport();
+      renderAllPresetThumbnails();
+      renderPreview();
+    }
+
+    function fitStageToViewport() {
+      const viewport = document.getElementById('viewportContainer');
+      const stage = document.getElementById('stageWrapper');
+      if (!viewport || !stage) return;
+
+      const availW = Math.max(220, viewport.clientWidth - 8);
+      const availH = Math.max(220, viewport.clientHeight - 8);
+      const imgRatio = state.sourceWidth / state.sourceHeight;
+
+      let targetW = availW;
+      let targetH = targetW / imgRatio;
+
+      if (targetH > availH) {
+        targetH = availH;
+        targetW = targetH * imgRatio;
+      }
+
+      stage.style.width = ${Math.round(targetW)}px;
+      stage.style.height = ${Math.round(targetH)}px;
+    }
+
+    function handleUploadedFile(file) {
+      if (!file || !file.type.startsWith('image/')) {
+        showToast('Vui lòng chọn tệp hình ảnh hợp lệ (JPG, PNG, WebP).');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const tempCanvas = document.createElement('canvas');
+          tempCanvas.width = img.naturalWidth || img.width;
+          tempCanvas.height = img.naturalHeight || img.height;
+          const tCtx = tempCanvas.getContext('2d');
+          tCtx.drawImage(img, 0, 0);
+
+          document.querySelectorAll('.sample-btn').forEach(btn => {
+            btn.classList.remove('border-[#FF6B9D]/60', 'bg-[#FF6B9D]/15', 'text-white');
+            btn.classList.add('border-zinc-800', 'bg-zinc-900/90', 'text-zinc-300');
+          });
+
+          loadSourceFromCanvas(tempCanvas);
+          showToast(Đã tải ảnh lên (${tempCanvas.width} × ${tempCanvas.height} px));
+        };
+        img.onerror = () => {
+          showToast('Không thể đọc tệp ảnh này. Vui lòng thử ảnh khác.');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // ----------------------------------------------------------------------------
+    // 9. TÍNH TOÁN THÔNG SỐ TỔNG HỢP (BASIC + HSL) & RENDER PREVIEW
+    // ----------------------------------------------------------------------------
+    function recalculateEffectiveParams() {
+      const preset = getAllPresets().find(p => p.id === state.activePresetId);
+      const intensity = state.presetIntensity / 100;
+
+      if (preset) {
+        state.splitTone = preset.splitTone || null;
+        ADJUSTMENT_DEFS.forEach(def => {
+          const baseVal = (preset.params[def.key] || 0) * intensity;
+          const offsetVal = state.userOffsets[def.key] || 0;
+          const combined = Math.round(Math.max(def.min, Math.min(def.max, baseVal + offsetVal)));
+          state.currentParams[def.key] = combined;
+        });
+
+        HSL_CHANNELS.forEach(ch => {
+          const baseCh = (preset.hsl && preset.hsl[ch.key]) ? preset.hsl[ch.key] : { h: 0, s: 0, l: 0 };
+          const offCh = state.userHslOffsets[ch.key] || { h: 0, s: 0, l: 0 };
+          state.currentHsl[ch.key] = {
+            h: Math.round(Math.max(-100, Math.min(100, (baseCh.h || 0) * intensity + (offCh.h || 0)))),
+            s: Math.round(Math.max(-100, Math.min(100, (baseCh.s || 0) * intensity + (offCh.s || 0)))),
+            l: Math.round(Math.max(-100, Math.min(100, (baseCh.l || 0) * intensity + (offCh.l || 0)))),
+          };
+        });
+      } else {
+        ADJUSTMENT_DEFS.forEach(def => {
+          const scaled = Math.round((state.userOffsets[def.key] || 0) * intensity);
+          state.currentParams[def.key] = Math.max(def.min, Math.min(def.max, scaled));
+        });
+
+        HSL_CHANNELS.forEach(ch => {
+          const offCh = state.userHslOffsets[ch.key] || { h: 0, s: 0, l: 0 };
+          state.currentHsl[ch.key] = {
+            h: Math.round(Math.max(-100, Math.min(100, (offCh.h || 0) * intensity))),
+            s: Math.round(Math.max(-100, Math.min(100, (offCh.s || 0) * intensity))),
+            l: Math.round(Math.max(-100, Math.min(100, (offCh.l || 0) * intensity))),
+          };
+        });
+      }
+    }
+
+    let renderScheduled = false;
+    function renderPreview() {
+      if (renderScheduled) return;
+      renderScheduled = true;
+
+      requestAnimationFrame(() => {
+        renderScheduled = false;
+        const w = previewSourceCanvas.width;
+        const h = previewSourceCanvas.height;
+        if (!w || !h) return;
+
+        const baseData = previewSourceCtx.getImageData(0, 0, w, h);
+        const intensityRatio = state.presetIntensity / 100;
+        const processed = processPixelBuffer(baseData, state.currentParams, state.splitTone, intensityRatio, state.currentHsl);
+        editedCtx.putImageData(processed, 0, 0);
+      });
+    }
+
+    function renderSinglePresetThumbnail(preset) {
+      const w = thumbSourceCanvas.width;
+      const h = thumbSourceCanvas.height;
+      if (!w || !h) return;
+
+      const thumbCanvas = document.getElementById(preset-thumb-${preset.id});
+      if (!thumbCanvas) return;
+      thumbCanvas.width = w;
+      thumbCanvas.height = h;
+      const tCtx = thumbCanvas.getContext('2d');
+
+      const cloned = thumbSourceCtx.getImageData(0, 0, w, h);
+      const processed = processPixelBuffer(cloned, preset.params, preset.splitTone, 1, preset.hsl);
+      tCtx.putImageData(processed, 0, 0);
+    }
+
+    function renderAllPresetThumbnails() {
+      getAllPresets().forEach(preset => renderSinglePresetThumbnail(preset));
+    }
+
+    function applyPreset(presetId) {
+      const preset = getAllPresets().find(p => p.id === presetId);
+      if (!preset) return;
+
+      state.activePresetId = preset.id;
+      state.presetIntensity = 100;
+      ADJUSTMENT_DEFS.forEach(def => {
+        state.userOffsets[def.key] = 0;
+      });
+      state.userHslOffsets = createEmptyHslMap();
+
+      document.getElementById('presetIntensitySlider').value = 100;
+      document.getElementById('presetIntensityVal').textContent = '100%';
+      document.getElementById('activePresetBadge').textContent = preset.name;
+      document.getElementById('exportPresetText').textContent = preset.name;
+
+      recalculateEffectiveParams();
+      syncSlidersUI();
+      syncHslUI();
+      updateModifiedBadges();
+      highlightActivePresetCard();
+      renderPreview();
+    }
+
+    // ----------------------------------------------------------------------------
+    // 10. GIAO DIỆN 3 TAB, PRESET CARDS, BASIC SLIDERS & HSL COLOR MIXER
+    // ----------------------------------------------------------------------------
+    function switchInspectorTab(tabName) {
+      state.activeTab = tabName;
+
+      document.querySelectorAll('.inspector-tab-btn').forEach(btn => {
+        const isTarget = btn.dataset.tab === tabName;
+        if (isTarget) {
+          btn.classList.add('active-tab', 'bg-[#1A1A21]', 'text-white', 'font-semibold', 'shadow-sm', 'border-[#FF6B9D]/40');
+          btn.classList.remove('text-zinc-400', 'font-medium', 'border-transparent');
+        } else {
+          btn.classList.remove('active-tab', 'bg-[#1A1A21]', 'text-white', 'font-semibold', 'shadow-sm', 'border-[#FF6B9D]/40');
+          btn.classList.add('text-zinc-400', 'font-medium', 'border-transparent');
+        }
+      });
+
+      document.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.add('hidden');
+      });
+      const activePanel = document.getElementById(tabPanel-${tabName});
+      if (activePanel) activePanel.classList.remove('hidden');
+    }
+
+    function updateModifiedBadges() {
+      const hasBasic = ADJUSTMENT_DEFS.some(d => (state.currentParams[d.key] || 0) !== 0);
+      const hasHsl = HSL_CHANNELS.some(ch => {
+        const c = state.currentHsl[ch.key];
+        return c && (c.h !== 0 || c.s !== 0 || c.l !== 0);
+      });
+
+      document.getElementById('basicModifiedDot').classList.toggle('hidden', !hasBasic);
+      document.getElementById('hslModifiedDot').classList.toggle('hidden', !hasHsl);
+    }
+
+    function buildPresetsUI() {
+      const grid = document.getElementById('presetsGrid');
+      grid.innerHTML = '';
+
+      const allPresets = getAllPresets();
+      document.getElementById('presetTotalBadge').textContent = allPresets.length;
+      document.getElementById('customCountBadge').textContent = customPresets.length;
+
+      const customToolbar = document.getElementById('customPresetsToolbar');
+      customToolbar.classList.toggle('hidden', state.activePresetCategory !== 'custom');
+
+      const filtered = allPresets.filter(p => {
+        if (state.activePresetCategory === 'all') return true;
+        if (state.activePresetCategory === 'custom') return Boolean(p.isCustom);
+        if (state.activePresetCategory === 'lightroom') return p.category === 'lightroom';
+        if (state.activePresetCategory === 'hypic') return p.category === 'hypic';
+        return true;
+      });
+
+      if (filtered.length === 0 && state.activePresetCategory === 'custom') {
+        grid.innerHTML = `
+          <div class="col-span-full rounded-2xl border border-dashed border-zinc-800 bg-[#1A1A21]/60 p-6 text-center">
+            <div class="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-[#FF6B9D]/15 text-[#FF6B9D] font-bold">+</div>
+            <p class="text-xs font-semibold text-zinc-200">Chưa có mẫu màu tự lưu trên máy này</p>
+            <p class="text-[11px] text-zinc-400 mt-1">Chỉnh màu ở tab Cơ bản hoặc Trộn màu HSL rồi bấm <strong>+ Lưu mẫu</strong> để lưu lại dùng sau.</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(preset => {
+        const card = document.createElement('div');
+        card.id = preset-card-${preset.id};
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+        card.className = 'preset-card group relative flex items-center gap-2.5 rounded-2xl border border-zinc-800/90 bg-[#1A1A21] p-2 text-left transition-all hover:border-zinc-700 cursor-pointer';
+
+        const tagBadgeClass = preset.isCustom
+          ? 'bg-[#FF6B9D]/20 text-[#FF6B9D]'
+          : preset.category === 'lightroom'
+            ? 'bg-sky-500/15 text-sky-300'
+            : 'bg-zinc-800/90 text-zinc-400';
+
+        const deleteBtnHtml = preset.isCustom
+          ? `<button type="button" data-del-id="${preset.id}" title="Xóa mẫu màu này" class="delete-preset-btn shrink-0 rounded-lg p-1 text-zinc-500 hover:bg-red-500/20 hover:text-red-400 transition">
+               <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+               </svg>
+             </button>`
+          : '';
+
+        card.innerHTML = `
+          <div class="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-zinc-900">
+            <canvas id="preset-thumb-${preset.id}" class="h-full w-full object-cover"></canvas>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="truncate text-xs font-semibold text-zinc-100 group-hover:text-white" title="${preset.name}">${preset.name}</div>
+            <span class="mt-0.5 inline-block rounded-md px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider ${tagBadgeClass}">
+              ${preset.tag}
+            </span>
+          </div>
+          ${deleteBtnHtml}
+        `;
+
+        card.addEventListener('click', (e) => {
+          const delBtn = e.target.closest('.delete-preset-btn');
+          if (delBtn) {
+            e.stopPropagation();
+            deleteCustomPreset(delBtn.dataset.delId);
+            return;
+          }
+          applyPreset(preset.id);
+        });
+
+        grid.appendChild(card);
+        renderSinglePresetThumbnail(preset);
+      });
+
+      highlightActivePresetCard();
+    }
+
+    function highlightActivePresetCard() {
+      document.querySelectorAll('.preset-card').forEach(card => {
+        card.classList.remove('border-[#FF6B9D]', 'bg-[#FF6B9D]/10', 'ring-1', 'ring-[#FF6B9D]/50');
+        card.classList.add('border-zinc-800/90', 'bg-[#1A1A21]');
+      });
+      const activeCard = document.getElementById(preset-card-${state.activePresetId});
+      if (activeCard) {
+        activeCard.classList.remove('border-zinc-800/90', 'bg-[#1A1A21]');
+        activeCard.classList.add('border-[#FF6B9D]', 'bg-[#FF6B9D]/10', 'ring-1', 'ring-[#FF6B9D]/50');
+      }
+    }
+
+    function buildSlidersUI() {
+      const container = document.getElementById('slidersContainer');
+      container.innerHTML = '';
+
+      ADJUSTMENT_DEFS.forEach(def => {
+        const iconSvg = def.icon === 'vignette'
+          ? <svg class="h-3.5 w-3.5 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="12" r="5"/></svg>
+          : <span class="text-xs">${def.icon}</span>;
+
+        const row = document.createElement('div');
+        row.className = 'rounded-2xl border border-zinc-800/70 bg-[#1A1A21]/75 px-3.5 py-2.5 transition hover:border-zinc-700/80';
+        row.innerHTML = `
+          <div class="flex items-center justify-between text-xs mb-2">
+            <label for="slider-${def.key}" class="flex items-center gap-1.5 font-medium text-zinc-200 cursor-pointer" title="Nhấp đúp để đặt lại 0">
+              ${iconSvg}
+              <span>${def.label}</span>
+            </label>
+            <span id="val-${def.key}" class="font-mono text-[11px] font-semibold text-zinc-400 min-w-[34px] text-right">0</span>
+          </div>
+          <input id="slider-${def.key}" type="range" min="${def.min}" max="${def.max}" value="0" class="studio-slider" />
+        `;
+
+        const sliderEl = row.querySelector(#slider-${def.key});
+        const labelEl = row.querySelector('label');
+
+        sliderEl.addEventListener('input', (e) => {
+          const newVal = parseInt(e.target.value, 10);
+          const preset = getAllPresets().find(p => p.id === state.activePresetId);
+          const intensity = state.presetIntensity / 100;
+
+          if (preset) {
+            const baseVal = (preset.params[def.key] || 0) * intensity;
+            state.userOffsets[def.key] = newVal - baseVal;
+          } else {
+            state.userOffsets[def.key] = intensity > 0 ? newVal / intensity : newVal;
+          }
+
+          state.currentParams[def.key] = newVal;
+          updateSingleSliderReadout(def.key, newVal);
+          updateModifiedBadges();
+          renderPreview();
+        });
+
+        labelEl.addEventListener('dblclick', () => {
+          sliderEl.value = 0;
+          sliderEl.dispatchEvent(new Event('input'));
+        });
+
+        container.appendChild(row);
+      });
+    }
+
+    function updateSingleSliderReadout(key, val) {
+      const valEl = document.getElementById(val-${key});
+      if (!valEl) return;
+      valEl.textContent = val > 0 ? +${val} : ${val};
+      if (val !== 0) {
+        valEl.classList.remove('text-zinc-400');
+        valEl.classList.add('text-[#FF6B9D]');
+      } else {
+        valEl.classList.remove('text-[#FF6B9D]');
+        valEl.classList.add('text-zinc-400');
+      }
+    }
+
+    function syncSlidersUI() {
+      ADJUSTMENT_DEFS.forEach(def => {
+        const val = state.currentParams[def.key] || 0;
+        const sliderEl = document.getElementById(slider-${def.key});
+        if (sliderEl) sliderEl.value = val;
+        updateSingleSliderReadout(def.key, val);
+      });
+    }
+
+    // ----------------------------------------------------------------------------
+    // 11. GIAO DIỆN & TƯƠNG TÁC TRỘN MÀU HSL (8 KÊNH MÀU LIGHTROOM)
+    // ----------------------------------------------------------------------------
+    function buildHslUI() {
+      const row = document.getElementById('hslSwatchesRow');
+      row.innerHTML = '';
+
+      HSL_CHANNELS.forEach(ch => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.id = hsl-swatch-${ch.key};
+        btn.title = ch.name;
+        btn.className = 'hsl-swatch-btn flex flex-col items-center gap-1 py-1 rounded-xl transition hover:bg-zinc-800/60';
+        btn.innerHTML = `
+          <span class="swatch-ring flex h-8 w-8 items-center justify-center rounded-full border-2 border-transparent transition-all">
+            <span class="h-6 w-6 rounded-full shadow-inner border border-white/20" style="background-color: ${ch.color};"></span>
+          </span>
+          <span class="text-[10px] font-medium text-zinc-400">${ch.short}</span>
+          <span id="hsl-dot-${ch.key}" class="h-1 w-1 rounded-full bg-[#FF6B9D] opacity-0 transition-opacity"></span>
+        `;
+
+        btn.addEventListener('click', () => {
+          state.selectedHslChannel = ch.key;
+          syncHslUI();
+        });
+
+        row.appendChild(btn);
+      });
+
+      // Gắn sự kiện kéo 3 thanh Hue / Saturation / Luminance
+      const bindHslSlider = (sliderId, propKey) => {
+        const el = document.getElementById(sliderId);
+        const label = document.querySelector(label[for="${sliderId}"]);
+
+        el.addEventListener('input', (e) => {
+          const val = parseInt(e.target.value, 10);
+          const chKey = state.selectedHslChannel;
+          const preset = getAllPresets().find(p => p.id === state.activePresetId);
+          const intensity = state.presetIntensity / 100;
+
+          if (preset) {
+            const baseCh = (preset.hsl && preset.hsl[chKey]) ? preset.hsl[chKey] : { h: 0, s: 0, l: 0 };
+            const baseVal = (baseCh[propKey] || 0) * intensity;
+            state.userHslOffsets[chKey][propKey] = val - baseVal;
+          } else {
+            state.userHslOffsets[chKey][propKey] = intensity > 0 ? val / intensity : val;
+          }
+
+          state.currentHsl[chKey][propKey] = val;
+          syncHslUI();
+          updateModifiedBadges();
+          renderPreview();
+        });
+
+        if (label) {
+          label.addEventListener('dblclick', () => {
+            el.value = 0;
+            el.dispatchEvent(new Event('input'));
+          });
+        }
+      };
+
+      bindHslSlider('hslHueSlider', 'h');
+      bindHslSlider('hslSatSlider', 's');
+      bindHslSlider('hslLumSlider', 'l');
+
+      syncHslUI();
+    }
+
+    function syncHslUI() {
+      const activeKey = state.selectedHslChannel;
+      const chDef = HSL_CHANNELS.find(c => c.key === activeKey) || HSL_CHANNELS[1];
+      const chVals = state.currentHsl[activeKey] || { h: 0, s: 0, l: 0 };
+
+      // Cập nhật vòng chọn & chấm báo hiệu trên cả 8 màu
+      HSL_CHANNELS.forEach(ch => {
+        const btn = document.getElementById(hsl-swatch-${ch.key});
+        const dot = document.getElementById(hsl-dot-${ch.key});
+        if (!btn) return;
+        const ring = btn.querySelector('.swatch-ring');
+        const label = btn.querySelector('span:nth-child(2)');
+
+        const isSelected = ch.key === activeKey;
+        if (isSelected) {
+          ring.classList.add('border-white', 'scale-110', 'shadow-md');
+          ring.classList.remove('border-transparent');
+          label.classList.add('text-white', 'font-bold');
+          label.classList.remove('text-zinc-400');
+        } else {
+          ring.classList.remove('border-white', 'scale-110', 'shadow-md');
+          ring.classList.add('border-transparent');
+          label.classList.remove('text-white', 'font-bold');
+          label.classList.add('text-zinc-400');
+        }
+
+        const cVal = state.currentHsl[ch.key];
+        const isModified = cVal && (cVal.h !== 0 || cVal.s !== 0 || cVal.l !== 0);
+        if (dot) dot.classList.toggle('opacity-0', !isModified);
+      });
+
+      // Cập nhật tiêu đề màu đang chọn
+      document.getElementById('selectedHslDot').style.backgroundColor = chDef.color;
+      document.getElementById('selectedHslName').textContent = chDef.name;
+      document.getElementById('selectedHslHint').textContent = chDef.hint;
+      document.getElementById('hslHueLeftLabel').textContent = chDef.leftHue;
+      document.getElementById('hslHueRightLabel').textContent = chDef.rightHue;
+
+      // Cập nhật 3 thanh trượt của màu đang chọn
+      const updateHslReadout = (sliderId, valId, val) => {
+        document.getElementById(sliderId).value = val;
+        const vEl = document.getElementById(valId);
+        vEl.textContent = val > 0 ? +${val} : ${val};
+        vEl.classList.toggle('text-[#FF6B9D]', val !== 0);
+        vEl.classList.toggle('text-zinc-400', val === 0);
+      };
+
+      updateHslReadout('hslHueSlider', 'hslHueVal', chVals.h);
+      updateHslReadout('hslSatSlider', 'hslSatVal', chVals.s);
+      updateHslReadout('hslLumSlider', 'hslLumVal', chVals.l);
+    }
+
+    // ----------------------------------------------------------------------------
+    // 12. LƯU, XÓA & XUẤT/NHẬP MẪU MÀU CÁ NHÂN THEO TỪNG MÁY
+    // ----------------------------------------------------------------------------
+    function openSavePresetModal() {
+      const modal = document.getElementById('savePresetModal');
+      const input = document.getElementById('customPresetNameInput');
+      input.value = '';
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      setTimeout(() => input.focus(), 60);
+    }
+
+    function closeSavePresetModal() {
+      const modal = document.getElementById('savePresetModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function saveCurrentLookAsCustomPreset() {
+      const input = document.getElementById('customPresetNameInput');
+      const rawName = input.value.trim();
+      const presetName = rawName || Mẫu tự chỉnh #${customPresets.length + 1};
+
+      const newPreset = {
+        id: 'custom_' + Date.now(),
+        name: presetName,
+        tag: state.selectedSaveTag || 'Tự chỉnh',
+        category: 'custom',
+        isCustom: true,
+        params: { ...state.currentParams },
+        hsl: cloneHslMap(state.currentHsl),
+        splitTone: state.splitTone ? JSON.parse(JSON.stringify(state.splitTone)) : null
+      };
+
+      customPresets.unshift(newPreset);
+      saveCustomPresetsToStorage();
+
+      // Đặt mẫu vừa lưu làm mẫu hiện hành ở mức 100%
+      state.activePresetId = newPreset.id;
+      state.presetIntensity = 100;
+      ADJUSTMENT_DEFS.forEach(def => { state.userOffsets[def.key] = 0; });
+      state.userHslOffsets = createEmptyHslMap();
+
+      document.getElementById('presetIntensitySlider').value = 100;
+      document.getElementById('presetIntensityVal').textContent = '100%';
+      document.getElementById('activePresetBadge').textContent = newPreset.name;
+      document.getElementById('exportPresetText').textContent = newPreset.name;
+
+      closeSavePresetModal();
+      switchInspectorTab('presets');
+      buildPresetsUI();
+      showToast(Đã lưu mẫu "${newPreset.name}" vào thiết bị này!);
+    }
+
+    function deleteCustomPreset(presetId) {
+      const idx = customPresets.findIndex(p => p.id === presetId);
+      if (idx === -1) return;
+
+      const removed = customPresets[idx];
+      customPresets.splice(idx, 1);
+      saveCustomPresetsToStorage();
+
+      if (state.activePresetId === presetId) {
+        state.activePresetId = 'custom_detached';
+      }
+
+      buildPresetsUI();
+      showToastWithUndo(Đã xóa mẫu "${removed.name}", () => {
+        customPresets.splice(idx, 0, removed);
+        saveCustomPresetsToStorage();
+        buildPresetsUI();
+        showToast(Đã khôi phục mẫu "${removed.name}");
+      });
+    }
+
+    function exportCustomPresetsJson() {
+      if (customPresets.length === 0) {
+        showToast('Bạn chưa có mẫu màu tự lưu nào để xuất.');
+        return;
+      }
+      const payload = {
+        app: 'Hypic Studio Pro',
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        presets: customPresets
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = hypic-presets-backup-${Date.now()}.json;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+      showToast(Đã xuất ${customPresets.length} mẫu màu ra file JSON!);
+    }
+
+    function handleImportPresetsJson(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          const list = Array.isArray(parsed) ? parsed : parsed.presets;
+          if (!Array.isArray(list) || list.length === 0) {
+            showToast('File JSON không chứa mẫu màu hợp lệ.');
+            return;
+          }
+
+          let added = 0;
+          list.forEach(item => {
+            if (item && item.params) {
+              customPresets.unshift({
+                id: 'custom_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                name: String(item.name || 'Mẫu nhập').slice(0, 32),
+                tag: String(item.tag || 'Tự chỉnh'),
+                category: 'custom',
+                isCustom: true,
+                params: { ...item.params },
+                hsl: cloneHslMap(item.hsl),
+                splitTone: item.splitTone || null
+              });
+              added++;
+            }
+          });
+
+          saveCustomPresetsToStorage();
+          buildPresetsUI();
+          showToast(Đã nhập thành công ${added} mẫu màu vào máy!);
+        } catch (err) {
+          showToast('Lỗi đọc file JSON. Vui lòng kiểm tra lại tệp.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // ----------------------------------------------------------------------------
+    // 13. TƯƠNG TÁC SO SÁNH TRƯỚC / SAU (SPLIT SLIDER & HOLD TO COMPARE)
+    // ----------------------------------------------------------------------------
+    function updateSplitClipUI() {
+      const beforeLayer = document.getElementById('beforeClipLayer');
+      const divider = document.getElementById('splitDivider');
+      const labelBefore = document.getElementById('labelBefore');
+      const labelAfter = document.getElementById('labelAfter');
+      const holdBanner = document.getElementById('holdingOriginalBanner');
+
+      if (state.isHoldingOriginal) {
+        beforeLayer.style.clipPath = 'inset(0 0% 0 0)';
+        divider.classList.add('hidden');
+        labelBefore.classList.add('opacity-0');
+        labelAfter.classList.add('opacity-0');
+        holdBanner.classList.remove('hidden');
+        return;
+      }
+
+      holdBanner.classList.add('hidden');
+
+      if (!state.splitActive) {
+        beforeLayer.style.clipPath = 'inset(0 100% 0 0)';
+        divider.classList.add('hidden');
+        labelBefore.classList.add('opacity-0');
+        labelAfter.classList.add('opacity-0');
+      } else {
+        const rightInset = 100 - state.splitPercent;
+        beforeLayer.style.clipPath = inset(0 ${rightInset}% 0 0);
+        divider.classList.remove('hidden');
+        divider.style.left = ${state.splitPercent}%;
+        labelBefore.classList.toggle('opacity-0', state.splitPercent < 12);
+        labelAfter.classList.toggle('opacity-0', state.splitPercent > 88);
+      }
+    }
+
+    function initSplitComparisonInteractions() {
+      const stageWrapper = document.getElementById('stageWrapper');
+      const splitDivider = document.getElementById('splitDivider');
+      let isDraggingSplit = false;
+
+      const updateSplitFromClientX = (clientX) => {
+        const rect = stageWrapper.getBoundingClientRect();
+        if (!rect.width) return;
+        const pct = ((clientX - rect.left) / rect.width) * 100;
+        state.splitPercent = Math.max(0, Math.min(100, pct));
+        updateSplitClipUI();
+      };
+
+      splitDivider.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        isDraggingSplit = true;
+      });
+      window.addEventListener('mousemove', (e) => {
+        if (!isDraggingSplit) return;
+        updateSplitFromClientX(e.clientX);
+      });
+      window.addEventListener('mouseup', () => {
+        isDraggingSplit = false;
+      });
+
+      splitDivider.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        isDraggingSplit = true;
+      }, { passive: false });
+      window.addEventListener('touchmove', (e) => {
+        if (!isDraggingSplit || !e.touches.length) return;
+        updateSplitFromClientX(e.touches[0].clientX);
+      }, { passive: true });
+      window.addEventListener('touchend', () => {
+        isDraggingSplit = false;
+      });
+
+      const toggleSplitBtn = document.getElementById('toggleSplitBtn');
+      toggleSplitBtn.addEventListener('click', () => {
+        state.splitActive = !state.splitActive;
+        if (state.splitActive) {
+          toggleSplitBtn.classList.remove('border-zinc-700/80', 'bg-zinc-800/90', 'text-zinc-300');
+          toggleSplitBtn.classList.add('border-[#FF6B9D]/50', 'bg-[#FF6B9D]/15', 'text-white');
+        } else {
+          toggleSplitBtn.classList.remove('border-[#FF6B9D]/50', 'bg-[#FF6B9D]/15', 'text-white');
+          toggleSplitBtn.classList.add('border-zinc-700/80', 'bg-zinc-800/90', 'text-zinc-300');
+        }
+        updateSplitClipUI();
+      });
+
+      const holdOriginalBtn = document.getElementById('holdOriginalBtn');
+      const startHold = () => {
+        state.isHoldingOriginal = true;
+        updateSplitClipUI();
+      };
+      const endHold = () => {
+        if (!state.isHoldingOriginal) return;
+        state.isHoldingOriginal = false;
+        updateSplitClipUI();
+      };
+
+      holdOriginalBtn.addEventListener('mousedown', startHold);
+      holdOriginalBtn.addEventListener('mouseup', endHold);
+      holdOriginalBtn.addEventListener('mouseleave', endHold);
+      holdOriginalBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startHold(); }, { passive: false });
+      holdOriginalBtn.addEventListener('touchend', endHold);
+
+      window.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' && document.activeElement.tagName !== 'INPUT') {
+          e.preventDefault();
+          startHold();
+        }
+      });
+      window.addEventListener('keyup', (e) => {
+        if (e.code === 'Space') {
+          endHold();
+        }
+      });
+    }
+
+    // ----------------------------------------------------------------------------
+    // 14. XUẤT FILE ẢNH CHẤT LƯỢNG GỐC (100% RESOLUTION) & THÔNG BÁO TOAST
+    // ----------------------------------------------------------------------------
+    function exportFullResolutionImage() {
+      const w = fullSourceCanvas.width;
+      const h = fullSourceCanvas.height;
+      if (!w || !h) return;
+
+      const exportCanvas = document.createElement('canvas');
+      exportCanvas.width = w;
+      exportCanvas.height = h;
+      const eCtx = exportCanvas.getContext('2d');
+
+      const fullData = fullSourceCtx.getImageData(0, 0, w, h);
+      const intensityRatio = state.presetIntensity / 100;
+      const processedFull = processPixelBuffer(fullData, state.currentParams, state.splitTone, intensityRatio, state.currentHsl);
+      eCtx.putImageData(processedFull, 0, 0);
+
+      const mime = state.exportFormat;
+      const ext = mime === 'image/png' ? 'png' : 'jpg';
+      const quality = mime === 'image/jpeg' ? 0.95 : undefined;
+
+      exportCanvas.toBlob((blob) => {
+        if (!blob) {
+          showToast('Có lỗi khi tạo tệp ảnh. Vui lòng thử lại.');
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = hypic-studio-${state.activePresetId}-${Date.now()}.${ext};
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+
+        document.getElementById('exportModal').classList.add('hidden');
+        document.getElementById('exportModal').classList.remove('flex');
+        showToast(Đã lưu ảnh ${w}×${h}px (${ext.toUpperCase()}) thành công!);
+      }, mime, quality);
+    }
+
+    function showToast(message) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'rounded-full border border-[#FF6B9D]/40 bg-[#18181F]/95 backdrop-blur-md px-4 py-2 text-xs sm:text-sm font-medium text-white shadow-2xl transition-all duration-300 opacity-0 translate-y-2';
+      toast.textContent = message;
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('opacity-0', 'translate-y-2');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    function showToastWithUndo(message, onUndo) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'pointer-events-auto flex items-center gap-3 rounded-full border border-[#FF6B9D]/40 bg-[#18181F]/95 backdrop-blur-md px-4 py-2 text-xs sm:text-sm font-medium text-white shadow-2xl transition-all duration-300 opacity-0 translate-y-2';
+      toast.innerHTML = `
+        <span>${message}</span>
+        <button type="button" class="rounded-full bg-[#FF6B9D]/20 px-2.5 py-0.5 text-xs font-bold text-[#FF6B9D] hover:bg-[#FF6B9D]/30">Hoàn tác</button>
+      `;
+
+      const undoBtn = toast.querySelector('button');
+      undoBtn.addEventListener('click', () => {
+        onUndo();
+        toast.remove();
+      });
+
+      container.appendChild(toast);
+      requestAnimationFrame(() => {
+        toast.classList.remove('opacity-0', 'translate-y-2');
+      });
+
+      setTimeout(() => {
+        if (!toast.parentElement) return;
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 4500);
+    }
+
+    // ----------------------------------------------------------------------------
+    // 15. KHỞI CHẠY ỨNG DỤNG & GẮN TOÀN BỘ SỰ KIỆN
+    // ----------------------------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      loadCustomPresetsFromStorage();
+      buildPresetsUI();
+      buildSlidersUI();
+      buildHslUI();
+      initSplitComparisonInteractions();
+
+      // Nạp ảnh mẫu mặc định đầu tiên (Hoàng Hôn)
+      const initialSampleCanvas = document.createElement('canvas');
+      SampleArtworkGenerator.renderSample('sunset_muse', initialSampleCanvas);
+      loadSourceFromCanvas(initialSampleCanvas);
+
+      // Chuyển đổi 3 Tab điều khiển
+      document.querySelectorAll('.inspector-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => switchInspectorTab(btn.dataset.tab));
+      });
+
+      // Bộ lọc danh mục Mẫu màu (Tất cả / Của tôi / Lightroom / Hypic & Film)
+      document.querySelectorAll('.preset-cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.activePresetCategory = btn.dataset.cat;
+          document.querySelectorAll('.preset-cat-btn').forEach(b => {
+            b.classList.remove('active-cat', 'border-[#FF6B9D]/60', 'bg-[#FF6B9D]/15', 'text-white', 'font-semibold');
+            b.classList.add('border-zinc-800', 'bg-[#1A1A21]', 'text-zinc-300', 'font-medium');
+          });
+          btn.classList.remove('border-zinc-800', 'bg-[#1A1A21]', 'text-zinc-300', 'font-medium');
+          btn.classList.add('active-cat', 'border-[#FF6B9D]/60', 'bg-[#FF6B9D]/15', 'text-white', 'font-semibold');
+          buildPresetsUI();
+        });
+      });
+
+      // Chuyển đổi 3 ảnh mẫu tích hợp
+      document.querySelectorAll('.sample-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const sampleKey = btn.dataset.sample;
+          state.activeSampleKey = sampleKey;
+
+          document.querySelectorAll('.sample-btn').forEach(b => {
+            b.classList.remove('border-[#FF6B9D]/60', 'bg-[#FF6B9D]/15', 'text-white');
+            b.classList.add('border-zinc-800', 'bg-zinc-900/90', 'text-zinc-300');
+          });
+          btn.classList.remove('border-zinc-800', 'bg-zinc-900/90', 'text-zinc-300');
+          btn.classList.add('border-[#FF6B9D]/60', 'bg-[#FF6B9D]/15', 'text-white');
+
+          const sampleCanvas = document.createElement('canvas');
+          SampleArtworkGenerator.renderSample(sampleKey, sampleCanvas);
+          loadSourceFromCanvas(sampleCanvas);
+        });
+      });
+
+      // Thanh trượt Cường độ mẫu màu (0% - 100%)
+      const intensitySlider = document.getElementById('presetIntensitySlider');
+      intensitySlider.addEventListener('input', (e) => {
+        state.presetIntensity = parseInt(e.target.value, 10);
+        document.getElementById('presetIntensityVal').textContent = ${state.presetIntensity}%;
+        recalculateEffectiveParams();
+        syncSlidersUI();
+        syncHslUI();
+        updateModifiedBadges();
+        renderPreview();
+      });
+
+      // Nút Tự Động Chỉnh Màu AI
+      document.getElementById('autoColorBtn').addEventListener('click', runAutoColorAI);
+
+      // Nút Đặt lại toàn bộ / Cơ bản / HSL
+      document.getElementById('resetAllBtn').addEventListener('click', () => {
+        applyPreset('original');
+        showToast('Đã đặt lại toàn bộ về ảnh gốc.');
+      });
+
+      document.getElementById('resetAdjustmentsBtn').addEventListener('click', () => {
+        ADJUSTMENT_DEFS.forEach(def => { state.userOffsets[def.key] = 0; });
+        recalculateEffectiveParams();
+        syncSlidersUI();
+        updateModifiedBadges();
+        renderPreview();
+        showToast('Đã đặt lại các thanh Cơ bản.');
+      });
+
+      document.getElementById('resetSingleHslBtn').addEventListener('click', () => {
+        const chKey = state.selectedHslChannel;
+        state.userHslOffsets[chKey] = { h: 0, s: 0, l: 0 };
+        recalculateEffectiveParams();
+        syncHslUI();
+        updateModifiedBadges();
+        renderPreview();
+        const chDef = HSL_CHANNELS.find(c => c.key === chKey);
+        showToast(Đã đặt lại kênh màu ${chDef ? chDef.name : chKey}.);
+      });
+
+      document.getElementById('resetAllHslBtn').addEventListener('click', () => {
+        state.userHslOffsets = createEmptyHslMap();
+        HSL_CHANNELS.forEach(ch => {
+          state.currentHsl[ch.key] = { h: 0, s: 0, l: 0 };
+        });
+        syncHslUI();
+        updateModifiedBadges();
+        renderPreview();
+        showToast('Đã đặt lại toàn bộ 8 kênh Trộn màu HSL.');
+      });
+
+      // Modal Lưu Mẫu Màu Cá Nhân
+      document.getElementById('openSavePresetBtn').addEventListener('click', openSavePresetModal);
+      document.getElementById('inlineSavePresetBtn').addEventListener('click', openSavePresetModal);
+      document.getElementById('closeSavePresetModalBtn').addEventListener('click', closeSavePresetModal);
+      document.getElementById('savePresetModal').addEventListener('click', (e) => {
+        if (e.target.id === 'savePresetModal') closeSavePresetModal();
+      });
+
+      document.querySelectorAll('.preset-tag-choice').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.selectedSaveTag = btn.dataset.tag;
+          document.querySelectorAll('.preset-tag-choice').forEach(b => {
+            b.classList.remove('active-tag', 'border-[#FF6B9D]', 'bg-[#FF6B9D]/15', 'text-white', 'font-semibold');
+            b.classList.add('border-zinc-800', 'bg-[#1A1A21]', 'text-zinc-300', 'font-medium');
+          });
+          btn.classList.remove('border-zinc-800', 'bg-[#1A1A21]', 'text-zinc-300', 'font-medium');
+          btn.classList.add('active-tag', 'border-[#FF6B9D]', 'bg-[#FF6B9D]/15', 'text-white', 'font-semibold');
+        });
+      });
+
+      document.getElementById('confirmSavePresetBtn').addEventListener('click', saveCurrentLookAsCustomPreset);
+      document.getElementById('customPresetNameInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') saveCurrentLookAsCustomPreset();
+      });
+
+      // Xuất / Nhập file JSON mẫu màu cá nhân
+      document.getElementById('exportJsonPresetsBtn').addEventListener('click', exportCustomPresetsJson);
+      const importInput = document.getElementById('importPresetsInput');
+      document.getElementById('importJsonPresetsBtn').addEventListener('click', () => importInput.click());
+      importInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+          handleImportPresetsJson(e.target.files[0]);
+          importInput.value = '';
+        }
+      });
+
+      // Tải ảnh lên & Drag-and-Drop toàn trang
+      const fileInput = document.getElementById('imageFileInput');
+      document.getElementById('uploadBtn').addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+          handleUploadedFile(e.target.files[0]);
+          fileInput.value = '';
+        }
+      });
+
+      const dropOverlay = document.getElementById('dropOverlay');
+      let dragCounter = 0;
+      window.addEventListener('dragenter', (e) => {
+        e.preventDefault();
+        dragCounter++;
+        dropOverlay.classList.remove('hidden');
+        dropOverlay.classList.add('flex');
+      });
+      window.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        dragCounter--;
+        if (dragCounter <= 0) {
+          dragCounter = 0;
+          dropOverlay.classList.add('hidden');
+          dropOverlay.classList.remove('flex');
+        }
+      });
+      window.addEventListener('dragover', (e) => e.preventDefault());
+      window.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dragCounter = 0;
+        dropOverlay.classList.add('hidden');
+        dropOverlay.classList.remove('flex');
+        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+          handleUploadedFile(e.dataTransfer.files[0]);
+        }
+      });
+
+      // Modal Xuất Ảnh
+      const exportModal = document.getElementById('exportModal');
+      document.getElementById('openExportBtn').addEventListener('click', () => {
+        exportModal.classList.remove('hidden');
+        exportModal.classList.add('flex');
+      });
+      document.getElementById('closeExportModalBtn').addEventListener('click', () => {
+        exportModal.classList.add('hidden');
+        exportModal.classList.remove('flex');
+      });
+      exportModal.addEventListener('click', (e) => {
+        if (e.target === exportModal) {
+          exportModal.classList.add('hidden');
+          exportModal.classList.remove('flex');
+        }
+      });
+
+      document.querySelectorAll('.export-format-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.exportFormat = btn.dataset.format;
+          document.querySelectorAll('.export-format-btn').forEach(b => {
+            b.classList.remove('border-[#FF6B9D]', 'bg-[#FF6B9D]/15');
+            b.classList.add('border-zinc-800', 'bg-[#1A1A21]');
+          });
+          btn.classList.remove('border-zinc-800', 'bg-[#1A1A21]');
+          btn.classList.add('border-[#FF6B9D]', 'bg-[#FF6B9D]/15');
+        });
+      });
+
+      document.getElementById('confirmDownloadBtn').addEventListener('click', exportFullResolutionImage);
+
+      // Tự động điều chỉnh kích thước khung ảnh khi xoay màn hình / đổi cỡ cửa sổ
+      window.addEventListener('resize', fitStageToViewport);
+    });
+  </script>
+</body>
+</html>
