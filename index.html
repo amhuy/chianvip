@@ -170,7 +170,7 @@
     }
   </style>
 </head>
-<body class="min-h-[100dvh] lg:h-screen lg:overflow-hidden flex flex-col select-none">
+<body class="h-[100dvh] overflow-hidden flex flex-col select-none">
 
   <!-- Hidden File Inputs (image/* giúp iPhone chọn ảnh HEIC/JPG mượt mà) -->
   <input type="file" id="imageFileInput" accept="image/*" class="hidden" />
@@ -190,7 +190,7 @@
   </div>
 
   <!-- Top Navigation Header -->
-  <header class="sticky top-0 z-30 border-b border-zinc-800/80 bg-[#121216]/95 backdrop-blur-md px-3 sm:px-6 py-2.5">
+  <header class="shrink-0 z-30 border-b border-zinc-800/80 bg-[#121216]/95 backdrop-blur-md px-3 sm:px-6 py-1.5 sm:py-2.5">
     <div class="mx-auto flex max-w-[1720px] flex-wrap items-center justify-between gap-2">
       <!-- Brand Identity -->
       <div class="flex items-center gap-2.5">
@@ -273,13 +273,23 @@
         <div class="h-72 w-72 rounded-full bg-[#8B5CF6]/20 blur-[110px] -ml-16"></div>
       </div>
 
+      <!-- Main Studio Workspace -->
+  <main class="flex-1 min-h-0 flex flex-col lg:flex-row overflow-hidden">
+    
+    <!-- LEFT / CENTER: Canvas Viewport & Before/After Split Comparison -->
+    <section class="relative h-[56dvh] sm:h-[58dvh] lg:h-auto lg:flex-1 shrink-0 flex flex-col items-center justify-between bg-[#09090B] px-2 pt-1.5 pb-2 sm:p-5 lg:p-6 overflow-hidden">
+      <div class="pointer-events-none absolute inset-0 flex items-center justify-center opacity-25">
+        <div class="h-72 w-72 rounded-full bg-[#FF6B9D]/20 blur-[110px]"></div>
+        <div class="h-72 w-72 rounded-full bg-[#8B5CF6]/20 blur-[110px] -ml-16"></div>
+      </div>
+
       <!-- Top Image Metadata & Quick Hint Bar -->
-      <div class="relative z-10 flex w-full max-w-4xl items-center justify-between gap-2 pb-2 text-xs text-zinc-400">
+      <div class="relative z-10 flex w-full max-w-4xl items-center justify-between gap-2 pb-1 sm:pb-2 text-xs text-zinc-400">
         <div class="flex items-center gap-2 min-w-0">
-          <span id="imageDimensionsBadge" class="rounded-lg border border-zinc-800 bg-[#121216]/90 px-2.5 py-1 font-mono text-[11px] text-zinc-300 shrink-0">
+          <span id="imageDimensionsBadge" class="rounded-lg border border-zinc-800 bg-[#121216]/90 px-2.5 py-0.5 sm:py-1 font-mono text-[11px] text-zinc-300 shrink-0">
             1080 × 1350 px
           </span>
-          <span id="activePresetBadge" class="truncate rounded-lg border border-[#FF6B9D]/30 bg-[#FF6B9D]/10 px-2.5 py-1 text-[11px] font-medium text-[#FF6B9D]">
+          <span id="activePresetBadge" class="truncate rounded-lg border border-[#FF6B9D]/30 bg-[#FF6B9D]/10 px-2.5 py-0.5 sm:py-1 text-[11px] font-medium text-[#FF6B9D]">
             Gốc
           </span>
         </div>
@@ -291,7 +301,7 @@
       </div>
 
       <!-- Central Image Stage Container -->
-      <div id="viewportContainer" class="relative z-10 flex-1 w-full flex items-center justify-center min-h-[250px] max-h-[44vh] sm:max-h-[54vh] lg:max-h-none my-1">
+      <div id="viewportContainer" class="relative z-10 flex-1 min-h-0 w-full flex items-center justify-center my-0.5 sm:my-1">
         <div id="stageWrapper" class="relative overflow-hidden rounded-2xl border border-zinc-800/90 studio-checkerboard shadow-[0_20px_60px_rgba(0,0,0,0.85)] transition-shadow duration-300">
           <canvas id="editedCanvas" class="block w-full h-full"></canvas>
 
@@ -323,7 +333,7 @@
       </div>
 
       <!-- Bottom Floating Studio Action Bar -->
-      <div class="relative z-10 mt-2.5 flex flex-wrap items-center justify-center gap-2 sm:gap-3 rounded-2xl border border-zinc-800/90 bg-[#121216]/95 backdrop-blur-md p-2 shadow-xl">
+      <div class="relative z-10 mt-1.5 sm:mt-2.5 flex items-center justify-center gap-1.5 sm:gap-3 rounded-2xl border border-zinc-800/90 bg-[#121216]/95 backdrop-blur-md p-1.5 sm:p-2 shadow-xl">
         <button id="autoColorBtn" type="button" class="ai-btn-glow flex items-center gap-1.5 rounded-xl hypic-gradient px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:brightness-110 active:scale-95">
           <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
@@ -348,11 +358,11 @@
       </div>
     </section>
 
-    <!-- RIGHT / BOTTOM INSPECTOR PANEL: 3-Tab Studio Controls -->
-    <aside class="w-full lg:w-[430px] xl:w-[460px] shrink-0 border-t lg:border-t-0 lg:border-l border-zinc-800/90 bg-[#121216] flex flex-col lg:h-full overflow-hidden">
+   <!-- RIGHT / BOTTOM INSPECTOR PANEL: 3-Tab Studio Controls -->
+    <aside class="flex-1 min-h-0 w-full lg:flex-none lg:w-[430px] xl:w-[460px] border-t lg:border-t-0 lg:border-l border-zinc-800/90 bg-[#121216] flex flex-col lg:h-full overflow-hidden">
       
       <!-- 3-Tab Navigation Header -->
-      <div class="sticky top-0 z-20 border-b border-zinc-800/90 bg-[#121216] px-3 sm:px-4 pt-3 pb-2.5">
+      <div class="shrink-0 z-20 border-b border-zinc-800/90 bg-[#121216] px-3 sm:px-4 pt-2.5 pb-2">
         <div class="grid grid-cols-3 gap-1.5 rounded-2xl bg-[#09090B] p-1 border border-zinc-800/80">
           <button type="button" data-tab="presets" class="inspector-tab-btn active-tab flex items-center justify-center gap-1.5 rounded-xl py-2 px-2 text-xs sm:text-sm font-semibold transition-all bg-[#1A1A21] text-white shadow-sm border border-[#FF6B9D]/40">
             <span>🎨 Mẫu màu</span>
@@ -372,7 +382,7 @@
       </div>
 
       <!-- Scrollable Tab Content Area -->
-      <div class="flex-1 overflow-y-auto p-4 sm:p-5">
+      <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain p-3.5 sm:p-5">
 
         <!-- TAB 1: MẪU MÀU -->
         <div id="tabPanel-presets" class="tab-panel space-y-4">
@@ -1819,8 +1829,8 @@
       const stage = document.getElementById('stageWrapper');
       if (!viewport || !stage) return;
 
-      const availW = Math.max(220, viewport.clientWidth - 8);
-      const availH = Math.max(220, viewport.clientHeight - 8);
+      const availW = Math.max(120, viewport.clientWidth - 4);
+      const availH = Math.max(120, viewport.clientHeight - 4);
       const imgRatio = state.sourceWidth / state.sourceHeight;
 
       let targetW = availW;
